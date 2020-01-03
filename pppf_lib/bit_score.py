@@ -155,12 +155,15 @@ def precluster(pb, cutoff, verbose=False):
 
         # now update friends with all members of the sets in friend clusters
         for c in freindclusters:
-            friends.update(id_by_clusters[c])
+            if c in id_by_clusters:
+                friends.update(id_by_clusters[c])
 
         # finally set friends to be in clustercount cluster and set id_by_clusters to include our friends
 
         clusters_by_id.update({x:currentcluster for x in friends})
         id_by_clusters[currentcluster] = friends
+        if verbose:
+            sys.stderr.write(f"{bcolors.BLUE}Added cluster {currentcluster}{bcolors.ENDC}\n")
 
     if verbose:
         sys.stderr.write(f"{bcolors.GREEN}Maximum cluster is {clustercount} but we have {len(id_by_clusters.keys())} clusters{bcolors.ENDC}\n")
