@@ -13,6 +13,10 @@ def self_bit_scores(blastf, verbose=False):
     Generate a dict of self:self bitscores
     """
 
+
+    if verbose:
+        sys.stderr.write(f"{bcolors.GREEN}Calculating self:self bitscores{bcolors.ENDC}\n")
+
     ss = {}
     for b in stream_blast_results(blastf, verbose):
         if b.query == b.db:
@@ -52,6 +56,8 @@ def pairwise_bit_scores(blastf, ss, verbose=False):
             # the bit score by twice
             # the average length of the proteins
             # i.e. the sum of the lengths
+            if verbose:
+                sys.stderr.write(f"{bcolors.PINK}Had to guess self:self score for {b.query} to {b.db}{bcolors.ENDC}\n")
             nb = b.bitscore / (b.query_length + b.subject_length + 3.3)
 
         if b.query in pb[b.db] and pb[b.db][b.query] > nb:
@@ -73,7 +79,7 @@ def write_pb(outf, pb, verbose=False):
     with open(outf + ".tsv", 'w') as out:
         out.write("Query\tSubject\tnBits\n")
         for p in pb:
-            for q in pb:
+            for q in pb[p]:
                 out.write(f"{p}\t{q}\t{pb[p][q]}\n")
 
 def write_matrix(outf, pb, verbose=False):
