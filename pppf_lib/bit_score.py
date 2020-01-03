@@ -1,4 +1,9 @@
 """
+Calculate a normalized bit score as a distance score.
+
+The normalized bit score is generally defined as 1 - (bitscore / average(self-self bitscore of query and subject))
+note that it is 1-b so that identical proteins have a score of 0 and can thus be used immediately as a distance
+measure.
 
 """
 
@@ -50,7 +55,7 @@ def pairwise_bit_scores(blastf, ss, verbose=False):
 
         # we normalize by the bitscore of the two proteins if we can!
         if b.query in ss and b.db in ss:
-            nb = b.bitscore / ((ss[b.query] + ss[b.db])/2)
+            nb = 1 - (b.bitscore / ((ss[b.query] + ss[b.db])/2))
         else:
             # if we can't do that, we cheat and normalize 
             # the bit score by twice
@@ -58,7 +63,7 @@ def pairwise_bit_scores(blastf, ss, verbose=False):
             # i.e. the sum of the lengths
             if verbose:
                 sys.stderr.write(f"{bcolors.PINK}Had to guess self:self score for {b.query} to {b.db}{bcolors.ENDC}\n")
-            nb = b.bitscore / (b.query_length + b.subject_length + 3.3)
+            nb = 1 - (b.bitscore / (b.query_length + b.subject_length + 3.3))
 
         if b.query in pb[b.db] and pb[b.db][b.query] > nb:
             continue
@@ -105,7 +110,7 @@ def write_matrix(outf, pb, verbose=False):
                 if p == q:
                     out.write("\t0")
                 elif q in pb[p]:
-                    out.write(f"\t{1-pb[p][q]}")
+                    out.write(f"\t{pb[p][q]}")
                 else:
                     out.write("\t1")
             out.write("\n")
@@ -145,6 +150,9 @@ def precluster(pb, cutoff, verbose=False):
         friends = {k}
         freindclusters = {clustercount}
         for j in pb[k]:
+            if j == k:
+                # ignore self clusters!
+                continue
             if pb[k][j] > cutoff:
                 continue
             friends.add(j)
@@ -182,7 +190,7 @@ def write_clusters(outf, cls, verbose=False):
     if verbose:
         sys.stderr.write(f"{bcolors.GREEN}Writing clusters{bcolors.ENDC}\n")
 
-    out=open(outf, 'w')
+    out=open(outf + ".cls", 'w')
     ids = list(cls.keys())
     ids.sort()
     for i, j in enumerate(ids):
