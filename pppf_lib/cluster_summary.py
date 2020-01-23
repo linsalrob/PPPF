@@ -84,7 +84,7 @@ def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
 
         for row in cur.fetchall():
             if eout:
-                r = "\t".join(row)
+                r = "\t".join(map(str, row))
                 eout.write(f'{clid}\t{r}\n')
             lens.append(row[1])
             if row[1] > longest[1]:
