@@ -31,3 +31,11 @@ class Cluster:
         self.exemplar = exemplar
         self.members = set(members)
         self.members.add(exemplar)
+        self.longest_id = None
+        self.longest_len = None
+        self.shortest_id = None
+        self.shortest_len = None
+        self.average_size = 0
+        self.number_of_members = len(self.members)
+        self.functions = set()
+        self.number_of_functions = 0
