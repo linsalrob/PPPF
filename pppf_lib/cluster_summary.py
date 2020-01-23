@@ -58,9 +58,12 @@ def summarize_a_cluster(cl, conn, verbose=False):
     :return: the modified cluster object
     """
 
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
+
     cur = conn.cursor()
     protein_query = "select accession, contig, protein_sequence, length, product from protein where accession in (?)"
-    cur.execute(protein_query, cl.members)
+    cur.execute(protein_query, list(cl.members))
 
     lens = []
     shortest = [None, 10000]
@@ -120,3 +123,4 @@ if __name__ == '__main__':
 
     for c in newclusters:
         print(f"{c.exemplar}\t{c.number_of_members}\t{c.number_of_functions}\t{c.shortest_len}\t{c.longest_len}")
+
