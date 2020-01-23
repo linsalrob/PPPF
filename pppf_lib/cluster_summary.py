@@ -49,19 +49,16 @@ def read_mmseqs_clusters(clf, verbose=False):
         sys.stderr.write(f"{color.BLUE}There were {cc} clusters{color.ENDC}\n")
     return cls
 
-def summarize_a_cluster(cl, conn, verbose=False):
+def summarize_a_cluster(cl, cur, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param cl: the cluster object
-    :param conn: the database connection
+    :param cur: the database connection cursor
     :param verbose: more output
     :return: the modified cluster object
     """
 
-    if verbose:
-        sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
 
-    cur = conn.cursor()
     protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(cl.members))})"
     cur.execute(protein_query, list(cl.members))
 
@@ -102,8 +99,12 @@ def summarize_clusters(cls, dbf, verbose=False):
         sys.stderr.write(f"{color.RED}Could not connect to database {dbf}{color.ENDC}\n")
         sys.exit(-1)
 
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
+
+    cur = conn.cursor()
     for cl in cls:
-        updatedcls.append(summarize_a_cluster(cl, conn, verbose))
+        updatedcls.append(summarize_a_cluster(cl, cur, verbose))
 
     return updatedcls
 

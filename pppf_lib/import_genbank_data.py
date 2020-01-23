@@ -7,6 +7,7 @@ Import data from genbank into sqlite3
 import os
 import sys
 import argparse
+from . import color
 from database_handles import connect_to_db, disconnect
 
 def load_functions(tabf, dbfile, overwrite=False, verbose=False):
@@ -71,6 +72,14 @@ def load_functions(tabf, dbfile, overwrite=False, verbose=False):
             conn.execute(genome_insert, p[0:5])
             conn.execute(gene_insert, [p[5], p[2]] + p[6:9] + [p[10], len(p[10]), p[12]])
             conn.execute(protein_insert, [p[5], p[2], p[9], len(p[9]), p[11], p[12]])
+
+    if verbose:
+        sys.stderr.write(f"{color.BLUE}Creating indices{color.ENDC}\n")
+    conn.execute("create index genome_idx on genome (identifier, source_file, accession)")
+    conn.execute("create index gene_idx on gene (accession)")
+    conn.execute("create index prot_idx on protein (accession)")
+
+    conn.commit()
 
     disconnect(conn, verbose=verbose)
 
