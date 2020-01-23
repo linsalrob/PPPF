@@ -49,43 +49,44 @@ def read_mmseqs_clusters(clf, verbose=False):
         sys.stderr.write(f"{color.BLUE}There were {cc} clusters{color.ENDC}\n")
     return cls
 
-def summarize_a_cluster(cl, cur, verbose=False):
+def summarize_a_cluster(clid, mems, cur, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
-    :param cl: the cluster object
+    :param clid: cluster id
+    :param mems: the members of the cluster
     :param cur: the database connection cursor
     :param verbose: more output
     :return: the modified cluster object
     """
 
-    mems = list(cl.members)
-    if cl.number_of_members > 999:
-        sys.stderr.write(f"{color.PINK}The cluster id {cl.id} has {cl.number_of_members} members. Only processing 999{color.ENDC}\n")
-        mems = mems[0:999]
-
-    protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(mems))})"
-    cur.execute(protein_query, mems)
 
     lens = []
     shortest = [None, 10000]
     longest  = [None, 0]
     functions = set()
 
-    for row in cur.fetchall():
-        lens.append(row[1])
-        if row[1] > longest[1]:
-            longest = [row[0], row[1]]
-        if row[1] < shortest[1]:
-            shortest = [row[0], row[1]]
-        functions.add(row[2])
+    maxn = 500
+    c = 0
+    e = maxn
+    while c <= len(mems):
+        if c > 0:
+            sys.stderr.write(f"{color.PINK}Retrieving clusters {c}:{e} for {clid}{color.ENDC}\n")
+        tm = mems[c:e]
+        protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(tm))})"
+        cur.execute(protein_query, tm)
+        c = e
+        e += maxn
 
-    cl.longest_id = longest[0]
-    cl.longest_len = longest[1]
-    cl.shortest_id = shortest[0]
-    cl.shortest_len = shortest[1]
-    cl.number_of_functions = len(functions)
-    cl.all_functions = functions
-    return cl
+        for row in cur.fetchall():
+            lens.append(row[1])
+            if row[1] > longest[1]:
+                longest = [row[0], row[1]]
+            if row[1] < shortest[1]:
+                shortest = [row[0], row[1]]
+            functions.add(row[2])
+
+    return shortest[0], shortest[1], longest[0], longest[1], functions
+
 
 def summarize_clusters(cls, dbf, summf, verbose=False):
     """
@@ -112,9 +113,10 @@ def summarize_clusters(cls, dbf, summf, verbose=False):
     out = open(summf, 'w')
     out.write("Count\tExemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
     for cl in cls:
-        nc = summarize_a_cluster(cl, cur, verbose)
-        out.write(f"{nc.exemplar}\t{nc.number_of_members}\t{nc.number_of_functions}\t{nc.shortest_len}\t{nc.longest_len}\n")
-        updatedcls.append(nc)
+        cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions = summarize_a_cluster(cl.id, list(cl.members), cur, verbose)
+        cl.number_of_functions = len(cl.functions)
+        out.write(f"{cl.exemplar}\t{cl.number_of_members}\t{cl.number_of_functions}\t{cl.shortest_len}\t{cl.longest_len}\n")
+        updatedcls.append(cl)
 
     out.close()
 
