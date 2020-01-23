@@ -7,7 +7,7 @@ Import data from genbank into sqlite3
 import os
 import sys
 import argparse
-from .database_handles import connect_to_db, disconnect
+from database_handles import connect_to_db, disconnect
 
 def load_functions(tabf, dbfile, overwrite=False, verbose=False):
     """
@@ -27,7 +27,6 @@ def load_functions(tabf, dbfile, overwrite=False, verbose=False):
 
     conn.execute("""
         CREATE TABLE genome (
-            id INTEGER AUTOINCREMENT, 
             identifier TEXT,
             source_file TEXT, 
             accession TEXT, 
@@ -37,7 +36,6 @@ def load_functions(tabf, dbfile, overwrite=False, verbose=False):
 
     conn.execute("""
         CREATE TABLE gene (
-        id INTEGER AUTOINCREMENT, 
         accession TEXT,
         contig TEXT,
         start INTEGER,
@@ -50,7 +48,6 @@ def load_functions(tabf, dbfile, overwrite=False, verbose=False):
 
     conn.execute("""
         CREATE TABLE protein (
-        id INTEGER AUTOINCREMENT, 
         accession TEXT,
         contig TEXT,
         protein_sequence TEXT,
@@ -64,9 +61,9 @@ def load_functions(tabf, dbfile, overwrite=False, verbose=False):
 
     genome_insert = "INSERT INTO genome (identifier, source_file, accession, length, name) VALUES (?, ?, ?, ?, ?)"
 
-    gene_insert = "INSERT INTO gene (accession, contig, start, end, strand, dna_sequence, length, other_ids) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    gene_insert = "INSERT INTO gene (accession, contig, start, end, strand, dna_sequence, length, other_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
-    protein_insert = "INSERT INTO protein (accession, contig, protein_sequence, length, product, other_ids) VALUES (?, ?, ?, ?, ?)"
+    protein_insert = "INSERT INTO protein (accession, contig, protein_sequence, length, product, other_ids) VALUES (?, ?, ?, ?, ?, ?)"
 
     with open(tabf, 'r') as f:
         for l in f:
