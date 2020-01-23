@@ -7,6 +7,7 @@ etc.
 import os
 import sys
 import argparse
+import pickle
 
 from roblib import bcolors
 from cluster import Cluster
@@ -49,12 +50,13 @@ def read_mmseqs_clusters(clf, verbose=False):
         sys.stderr.write(f"{color.BLUE}There were {cc} clusters{color.ENDC}\n")
     return cls
 
-def summarize_a_cluster(clid, mems, cur, verbose=False):
+def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param clid: cluster id
     :param mems: the members of the cluster
     :param cur: the database connection cursor
+    :param exout: extended output file. If you want to add more data to the clusters (e.g. functions and lengths)
     :param verbose: more output
     :return: the modified cluster object
     """
@@ -68,6 +70,9 @@ def summarize_a_cluster(clid, mems, cur, verbose=False):
     maxn = 500
     c = 0
     e = maxn
+    eout = None
+    if exout:
+        eout = open(exout, 'a')
     while c <= len(mems):
         if c > 0:
             sys.stderr.write(f"{color.PINK}Retrieving clusters {c}:{e} for {clid}{color.ENDC}\n")
@@ -78,6 +83,9 @@ def summarize_a_cluster(clid, mems, cur, verbose=False):
         e += maxn
 
         for row in cur.fetchall():
+            if eout:
+                r = "\t".join(row)
+                eout.write(f'{clid}\t{r}\n')
             lens.append(row[1])
             if row[1] > longest[1]:
                 longest = [row[0], row[1]]
@@ -85,10 +93,13 @@ def summarize_a_cluster(clid, mems, cur, verbose=False):
                 shortest = [row[0], row[1]]
             functions.add(row[2])
 
+    if eout:
+        eout.close()
+
     return shortest[0], shortest[1], longest[0], longest[1], functions
 
 
-def summarize_clusters(cls, dbf, summf, verbose=False):
+def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param cls: the cluster object
@@ -113,7 +124,7 @@ def summarize_clusters(cls, dbf, summf, verbose=False):
     out = open(summf, 'w')
     out.write("Count\tExemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
     for cl in cls:
-        cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions = summarize_a_cluster(cl.id, list(cl.members), cur, verbose)
+        cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions = enrich_a_cluster(cl.id, list(cl.members), cur, exout, verbose)
         cl.number_of_functions = len(cl.functions)
         out.write(f"{cl.exemplar}\t{cl.number_of_members}\t{cl.number_of_functions}\t{cl.shortest_len}\t{cl.longest_len}\n")
         updatedcls.append(cl)
@@ -122,11 +133,28 @@ def summarize_clusters(cls, dbf, summf, verbose=False):
 
     return updatedcls
 
+def pickle_cluster_data(cl, pf, verbose=False):
+    """
+    Write the revised cluster data to a pickle file to use later
+    :param cl: the cluster information
+    :param pf: the pickle file to write
+    :param verbose: more output
+    :return:
+    """
+
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Writing pickle data{color.ENDC}\n")
+
+    with open(pf, 'wb') as po:
+        pickle.dump(cl, po)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize a set of clusters from mmseqs (or elsewhere)')
     parser.add_argument('-t', help='mmseqs format tsv file of clusters')
     parser.add_argument('-d', help='sqlite database file', required=True)
     parser.add_argument('-s', help='summary file to write', required=True)
+    parser.add_argument('-p', help='pickle file to write with enriched cluster information')
+    parser.add_argument('-e', help='enriched cluster output file')
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
@@ -136,7 +164,10 @@ if __name__ == '__main__':
     else:
         sys.stderr.write(f"{color.RED}Please provide a cluster file{color.ENDC}\n")
 
-    newclusters = summarize_clusters(clusters, args.d, args.s, args.v)
+    newclusters = enrich_cluster_data(clusters, args.d, args.s, args.e, args.v)
+
+    if args.p:
+        pickle_cluster_data(newclusters, args.p, args.v)
 
 
 
