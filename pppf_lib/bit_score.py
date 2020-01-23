@@ -191,6 +191,7 @@ def write_clusters(outf, cls, verbose=False):
         sys.stderr.write(f"{bcolors.GREEN}Writing clusters{bcolors.ENDC}\n")
 
     out=open(outf + ".cls", 'w')
+    out.write("cluster\tproteinID\n")
     ids = list(cls.keys())
     ids.sort()
     for i, j in enumerate(ids):

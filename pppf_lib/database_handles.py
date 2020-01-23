@@ -45,13 +45,3 @@ def disconnect(conn, verbose=False):
 
 
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Index a fastq file")
-    parser.add_argument('-f', help='fastq file to index', required=True)
-    parser.add_argument('-c', help='index file to create', required=True)
-    parser.add_argument('-w', help='overwrite the file if it exists', action="store_true")
-    parser.add_argument('-v', help='verbose output', action="store_true")
-    args = parser.parse_args()
-
-    create_index(args.f, args.c, args.w, args.v)
