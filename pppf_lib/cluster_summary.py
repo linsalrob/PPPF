@@ -62,7 +62,7 @@ def summarize_a_cluster(cl, conn, verbose=False):
         sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
 
     cur = conn.cursor()
-    protein_query = f"select accession, contig, protein_sequence, length, product from protein where accession in ({','.join(['?']*len(cl.members))})"
+    protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(cl.members))})"
     cur.execute(protein_query, list(cl.members))
 
     lens = []
@@ -71,12 +71,12 @@ def summarize_a_cluster(cl, conn, verbose=False):
     functions = set()
 
     for row in cur.fetchall():
-        lens.append(row['length'])
-        if row['length'] > longest[1]:
-            longest = [row['accession'], row['length']]
-        if row['length'] < shortest[1]:
-            shortest = [row['accession'], row['length']]
-        functions.add(row['product'])
+        lens.append(row[1])
+        if row[1] > longest[1]:
+            longest = [row[0], row[1]]
+        if row[1] < shortest[1]:
+            shortest = [row[0], row[1]]
+        functions.add(row[2])
 
     cl.longest_id = longest[0]
     cl.longest_len = longest[1]
