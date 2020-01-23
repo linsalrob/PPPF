@@ -58,9 +58,13 @@ def summarize_a_cluster(cl, cur, verbose=False):
     :return: the modified cluster object
     """
 
+    mems = list(cl.members)
+    if cl.number_of_members > 999:
+        sys.stderr.write(f"{color.PINK}The cluster id {cl.id} has {cl.number_of_members} members. Only processing 999{color.ENDC}\n")
+        mems = mems[0:999]
 
-    protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(cl.members))})"
-    cur.execute(protein_query, list(cl.members))
+    protein_query = f"select accession, length, product from protein where accession in ({','.join(['?']*len(mems))})"
+    cur.execute(protein_query, mems)
 
     lens = []
     shortest = [None, 10000]
