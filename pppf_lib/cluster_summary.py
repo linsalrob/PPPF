@@ -83,11 +83,12 @@ def summarize_a_cluster(cl, cur, verbose=False):
     cl.all_functions = functions
     return cl
 
-def summarize_clusters(cls, dbf, verbose=False):
+def summarize_clusters(cls, dbf, summf, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param cls: the cluster object
     :param dbf: the database file
+    :param summf: the summary file to write
     :param verbose: more output
     :return: the modified cluster object
     """
@@ -103,8 +104,15 @@ def summarize_clusters(cls, dbf, verbose=False):
         sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
 
     cur = conn.cursor()
+
+    out = open(summf, 'w')
+    out.write("Count\tExemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
     for cl in cls:
-        updatedcls.append(summarize_a_cluster(cl, cur, verbose))
+        nc = summarize_a_cluster(cl, cur, verbose)
+        out.write(f"{nc.exemplar}\t{nc.number_of_members}\t{nc.number_of_functions}\t{nc.shortest_len}\t{nc.longest_len}\n")
+        updatedcls.append(nc)
+
+    out.close()
 
     return updatedcls
 
@@ -112,6 +120,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize a set of clusters from mmseqs (or elsewhere)')
     parser.add_argument('-t', help='mmseqs format tsv file of clusters')
     parser.add_argument('-d', help='sqlite database file', required=True)
+    parser.add_argument('-s', help='summary file to write', required=True)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
@@ -121,8 +130,7 @@ if __name__ == '__main__':
     else:
         sys.stderr.write(f"{color.RED}Please provide a cluster file{color.ENDC}\n")
 
-    newclusters = summarize_clusters(clusters, args.d, args.v)
+    newclusters = summarize_clusters(clusters, args.d, args.s, args.v)
 
-    for c in newclusters:
-        print(f"{c.exemplar}\t{c.number_of_members}\t{c.number_of_functions}\t{c.shortest_len}\t{c.longest_len}")
+
 
