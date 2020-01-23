@@ -62,7 +62,7 @@ def summarize_a_cluster(cl, conn, verbose=False):
         sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
 
     cur = conn.cursor()
-    protein_query = "select accession, contig, protein_sequence, length, product from protein where accession in (?)"
+    protein_query = f"select accession, contig, protein_sequence, length, product from protein where accession in ({','.join(['?']*len(cl.members))})"
     cur.execute(protein_query, list(cl.members))
 
     lens = []
@@ -105,6 +105,7 @@ def summarize_clusters(cls, dbf, verbose=False):
     for cl in cls:
         updatedcls.append(summarize_a_cluster(cl, conn, verbose))
 
+    return updatedcls
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize a set of clusters from mmseqs (or elsewhere)')
