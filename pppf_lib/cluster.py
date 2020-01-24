@@ -15,6 +15,16 @@ class Cluster:
     :ivar id: A unique ID. If not provided we will calculate one
     :ivar exmmplar: The exemplar sequence
     :ivar members: a list or set (or settable object) of the members of the cluster
+    :ivar longest_id: the id of the longest protein or None if not set
+    :ivar longest_len: the length of the longest protein or None if not set
+    :ivar shortest_id: the id of the shortest protein or None if not set
+    :ivar shortest_len: the length of the shortest protein or None if not set
+    :ivar average_size: the average size of the members of the set or None if not set
+    :ivar number_of_members: the number of members in the cluster
+    :ivar number_of_functions: the number of unique functions in the cluster
+    :ivar functions: a set of unique functions
+    :ivar only_hypothetical: True is the set only has proteins whose functions are hypothetical.
+
     """
 
     def __init__(self, id, exemplar, members):
@@ -35,7 +45,8 @@ class Cluster:
         self.longest_len = None
         self.shortest_id = None
         self.shortest_len = None
-        self.average_size = 0
+        self.average_size = None
         self.number_of_members = len(self.members)
         self.functions = set()
         self.number_of_functions = 0
+        self.only_hypothetical = False
