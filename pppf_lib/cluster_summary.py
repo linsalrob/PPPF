@@ -142,7 +142,7 @@ def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
     cur = conn.cursor()
 
     out = open(summf, 'w')
-    out.write("Count\tExemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
+    out.write("Exemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
     for cl in cls:
         cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions, cl.average_size =\
             enrich_a_cluster(cl.id, list(cl.members), cur, exout, verbose)
