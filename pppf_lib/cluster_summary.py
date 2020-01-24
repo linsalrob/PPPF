@@ -8,7 +8,7 @@ import os
 import sys
 import argparse
 import pickle
-import json
+import jsonpickle
 
 from roblib import bcolors
 from cluster import Cluster
@@ -182,8 +182,8 @@ def json_cluster_data(cl, jf, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Writing json data{color.ENDC}\n")
 
-    with open(jf, 'w') as po:
-        json.dump(cl, po)
+    with open(jf, 'w') as jo:
+        jo.write(jsonpickle.encode(cl))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize a set of clusters from mmseqs (or elsewhere)')
