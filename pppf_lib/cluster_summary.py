@@ -14,7 +14,7 @@ from roblib import bcolors
 from cluster import Cluster
 from formatting import color
 from database_handles import connect_to_db
-from . import is_hypothetical
+from functions import is_hypothetical
 
 def read_mmseqs_clusters(clf, verbose=False):
     """
