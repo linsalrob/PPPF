@@ -115,7 +115,7 @@ def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
     if eout:
         eout.close()
 
-    return shortest[0], shortest[1], longest[0], longest[1], functions
+    return shortest[0], shortest[1], longest[0], longest[1], functions, sum(lens)/len(lens)
 
 
 def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
@@ -143,9 +143,11 @@ def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
     out = open(summf, 'w')
     out.write("Count\tExemplar\tNumber of proteins\tNumber of functions\tShortest protein\tLongest protein\n")
     for cl in cls:
-        cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions = enrich_a_cluster(cl.id, list(cl.members), cur, exout, verbose)
+        cl.shortest_id, cl.shortest_len, cl.longest_id, cl.longest_len, cl.functions, cl.average_size =\
+            enrich_a_cluster(cl.id, list(cl.members), cur, exout, verbose)
         cl.number_of_functions = len(cl.functions)
         cl.only_hypothetical = cluster_is_hypothetical(cl, verbose)
+
         out.write(f"{cl.exemplar}\t{cl.number_of_members}\t{cl.number_of_functions}\t{cl.shortest_len}\t{cl.longest_len}\n")
         updatedcls.append(cl)
 
