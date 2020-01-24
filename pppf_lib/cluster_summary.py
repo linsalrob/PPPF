@@ -9,6 +9,7 @@ import sys
 import argparse
 import pickle
 import jsonpickle
+import operator
 
 from roblib import bcolors
 from cluster import Cluster
@@ -84,7 +85,7 @@ def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
     lens = []
     shortest = [None, 10000]
     longest  = [None, 0]
-    functions = set()
+    functions = {}
 
     maxn = 500
     c = 0
@@ -110,7 +111,7 @@ def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
                 longest = [row[0], row[1]]
             if row[1] < shortest[1]:
                 shortest = [row[0], row[1]]
-            functions.add(row[2])
+            functions[row[2]] = functions.get(row[2], 0) + 1
 
     if eout:
         eout.close()
@@ -147,6 +148,9 @@ def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
             enrich_a_cluster(cl.id, list(cl.members), cur, exout, verbose)
         cl.number_of_functions = len(cl.functions)
         cl.only_hypothetical = cluster_is_hypothetical(cl, verbose)
+        # find the most frequent function
+        allfn = sorted(cl.functions.items(), key=lambda item: item[1], reverse=True)
+        cl.function = allfn[0][0]
 
         out.write(f"{cl.exemplar}\t{cl.number_of_members}\t{cl.number_of_functions}\t{cl.shortest_len}\t{cl.longest_len}\n")
         updatedcls.append(cl)

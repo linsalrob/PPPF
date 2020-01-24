@@ -22,7 +22,8 @@ class Cluster:
     :ivar average_size: the average size of the members of the set or None if not set
     :ivar number_of_members: the number of members in the cluster
     :ivar number_of_functions: the number of unique functions in the cluster
-    :ivar functions: a set of unique functions
+    :ivar functions: a dict of functions and their frequency
+    :ivar function: the most abundant function
     :ivar only_hypothetical: True is the set only has proteins whose functions are hypothetical.
 
     """
@@ -48,5 +49,6 @@ class Cluster:
         self.average_size = None
         self.number_of_members = len(self.members)
         self.functions = set()
+        self.function = None
         self.number_of_functions = 0
         self.only_hypothetical = False
