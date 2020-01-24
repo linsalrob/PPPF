@@ -182,7 +182,7 @@ def json_cluster_data(cl, jf, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Writing json data{color.ENDC}\n")
 
-    with open(jf, 'wb') as po:
+    with open(jf, 'w') as po:
         json.dump(cl, po)
 
 if __name__ == '__main__':
