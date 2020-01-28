@@ -38,7 +38,7 @@ def read_mmseqs_clusters(clf, verbose=False):
             if lastclid != p[0]:
                 # this is a new cluster
                 if lastclid:
-                    cls.append(Cluster(lastclid, lastclid, thiscls))
+                    cls.append(Cluster(None, lastclid, thiscls))
                     cc += 1
                 lastclid = p[0]
                 thiscls = set()
