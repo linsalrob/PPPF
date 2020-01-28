@@ -11,7 +11,6 @@ We are more interested in getting the protein sequences organized into clusters!
 This table describes a genome sequence
 This information generally comes from the GenBank or other source file.
 
---- | ---
 Attribute | Value
 --- | ---
 identifier | TEXT
@@ -26,7 +25,6 @@ sequence | TEXT
 A gene is the DNA sequence that encodes a feature. It may or may not encode a protein (it could also encode some other feature).
 This information generally comes from the GenBank or other source file.
 
---- | ---
 Attribute | Value
 --- | ---
 accession | TEXT
