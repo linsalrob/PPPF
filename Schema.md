@@ -41,7 +41,6 @@ other_ids | TEXT
 A protein is the protein sequence that is encoded by a protein encoding gene. 
 This information generally comes from the GenBank or other source file.
 
---- | ---
 Attribute | Value
 --- | ---
 accession | TEXT
@@ -58,7 +57,6 @@ Product is often referred to as function.
 The ClusterDefinitions table contains information about a specific class of clusters, how they were created and what the parameters were for the clustering.
 Note that each cluster definition will describe hundreds of clusters
 
---- | --- | ---
 Attribute | Value | Meaning
 --- | --- | ---
 uuid | TEXT | Universal unique ID for this cluster definition
@@ -71,7 +69,6 @@ command | TEXT | The command line invocation of the cluster
 
 A cluster refers to a specific group of proteins that are somehow related to each other.
 
---- | --- | ---
 Attribute | Value | Meaning
 --- | --- | ---
 uuid | TEXT | Universal unique ID for this cluster
@@ -84,7 +81,6 @@ altfunctions | TEXT | json format text representing all the functions encoded in
 
 The connection between *proteins* and *clusters*. Neither protein nor cluster in this table needs to be unique (i.e. many:many)
 
---- | --- | ---
 Attribute | Value | Meaning
 --- | --- | ---
 protein | TEXT | A protein accession. Foreign key to the protein table
