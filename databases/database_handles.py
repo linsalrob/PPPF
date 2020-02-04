@@ -2,12 +2,9 @@
 Create and maintain the connections to the SQLite database
 """
 
-
-import os
 import sys
-import argparse
 import sqlite3
-import gzip
+from formatting import color
 
 
 def connect_to_db(dbname, verbose=False):
@@ -25,7 +22,9 @@ def connect_to_db(dbname, verbose=False):
         sys.exit(-1)
 
     if verbose:
-        sys.stderr.write("Connected to database: {}\n".format(sqlite3.version))
+        sys.stderr.write(f"{color.GREEN}Connected to database: {sqlite3.version}{color.ENDC}\n")
+
+    conn.execute("PRAGMA foreign_keys = ON;")
 
     return conn
 
@@ -41,7 +40,7 @@ def disconnect(conn, verbose=False):
         conn.commit()
         conn.close()
     elif verbose:
-        sys.stderr.write("There was no database connection!\n")
+        sys.stderr.write(f"{color.RED}There was no database connection!{color.ENDC}\n")
 
 
 

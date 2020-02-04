@@ -1,16 +1,16 @@
 """
 Import data from genbank into sqlite3
 
-
+Do not use this code!
 """
 
 import os
 import sys
 import argparse
-from . import color
+from formatting import color
 from databases.database_handles import connect_to_db, disconnect
 
-def load_functions(tabf, dbfile, overwrite=False, verbose=False):
+def load_sequences(tabf, dbfile, overwrite=False, verbose=False):
     """
     Load the protein data into the database from a tab separated file. This is made by genbank2flatfile.pl sequences.gbk > sequences.tbl
     :param tabf: protein tabular output
@@ -58,5 +58,5 @@ if __name__ == '__main__':
     parser.add_argument('-v', help='verbose output', action='store_true', default=False)
     args = parser.parse_args()
 
-    load_functions(args.f, args.d, args.x, args.v)
+    load_sequences(args.f, args.d, args.x, args.v)
 

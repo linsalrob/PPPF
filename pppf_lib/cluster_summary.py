@@ -4,17 +4,14 @@ the range length of the proteins, and the number of unique functions.
 etc.
 """
 
-import os
 import sys
 import argparse
 import pickle
 import jsonpickle
-import operator
 
-from roblib import bcolors
 from cluster import Cluster
 from formatting import color
-from database_handles import connect_to_db
+from databases.database_handles import connect_to_db
 from functions import is_hypothetical
 
 def read_mmseqs_clusters(clf, verbose=False):
