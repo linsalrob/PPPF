@@ -6,7 +6,10 @@ These are deliberately designed to be lightweight at this development stage, and
 
 We are more interested in getting the protein sequences organized into clusters!
 
-**Note:** All tables names are singular (cluster, proteincluster, etc) and lower case.
+**Notes:** 
+- All tables names are singular (cluster, proteincluster, etc) and lower case.
+- The md5sum is calculated using the Python `hashlib` library. The sequence is converted to `utf-8` typically like so:
+    `seqmd5 = hashlib.md5(str(seq.seq).encode('utf-8')).hexdigest()`
 
 ## Genome table
 
@@ -47,11 +50,12 @@ contig | TEXT | The contig where the gene is found
 start | INTEGER | The start position 
 end | INTEGER | The end position
 strand | INTEGER | The strand
-length | INTEGER | The length of the gene in `bp`
 dna_sequence | TEXT | The DNA sequence
-protein | INTEGER | The primary ID of the associated protein sequence
-other_ids | TEXT | Any other IDs. A comma-separated list of <code>db&#124;identifier`</code>
 dna_sequence_md | TEXT | the md5 sum of the uppercase DNA sequence
+protein | INTEGER | The primary ID of the associated protein sequence
+length | INTEGER | The length of the gene in `bp`
+db_xref | TEXT | Any other IDs. A pipe-separated list of <code>db&#124;identifier`</code>
+
 ## Protein table
 
 A `protein` is the protein sequence that is encoded by a protein encoding gene. 
