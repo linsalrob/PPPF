@@ -23,6 +23,9 @@ def load_genbank_file(gbkf, conn, verbose=True):
     :return:
     """
 
+    if verbose:
+        sys.stderr.write(f"{color.PINK}Parsing {gbkf}{color.ENDC}\n")
+
     c = conn.cursor()
 
     for seq in SeqIO.parse(open(gbkf, 'r'), "genbank"):
@@ -63,8 +66,6 @@ def load_genbank_file(gbkf, conn, verbose=True):
 
         # the information for the genes
         for feat in seq.features:
-            if verbose:
-                sys.stderr.write(f"{color.BLUE}Parsing a {feat.type}{color.ENDC}\n")
             if feat.type == 'source':
                 for s in srcmtd.keys():
                     if s in feat.qualifiers:
