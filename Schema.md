@@ -15,14 +15,24 @@ This information generally comes from the GenBank or other source file.
 
 Attribute | Value | Meaning
 --- | --- | ---
-genome_id | INTEGER PRIMARY KEY | The autoincremented ID. When inserting, set this to null (see note below)
-identifier | TEXT
-source_file | TEXT
-accession | TEXT
-length | INTEGER
-name | TEXT
-sequence | TEXT
+genome_rowid | INTEGER PRIMARY KEY | The autoincremented ID. When inserting, set this to null (see note below)
+identifier | TEXT | 
+source_file | TEXT | the name (and path) of the file that we got this from.
+accession | TEXT |
+name | TEXT | the sample name (often same as identifier)
+source | TEXT | is generally the common name
+organism | TEXT | is generally the scientific name 
+taxonomy | TEXT | the taxonomy string
+collection_date | TEXT | when collected
+country | TEXT | where collected
+db_xref | TEXT | pipe-separated list of ids
+host | TEXT | the bacterial host
+isolation_source | TEXT | where it was isolated from
+strain | TEXT | the specific strain
+lab_host | TEXT | the lab host of this phage
+sequence | TEXT | the genome sequence
 sequence_md5 | TEXT | the md5 sum of the uppercase DNA genome sequence
+length | INTEGER | length of the genome sequence
 
 ## Gene table
 
@@ -31,7 +41,7 @@ This information generally comes from the GenBank or other source file.
 
 Attribute | Value | Meaning
 --- | --- | ---
-gene_id | INTEGER PRIMARY KEY | The autoincremented ID.
+gene_rowid | INTEGER PRIMARY KEY | The autoincremented ID.
 accession | TEXT | The gene's accession number
 contig | TEXT | The contig where the gene is found
 start | INTEGER | The start position 
@@ -49,15 +59,23 @@ This information generally comes from the GenBank or other source file.
 
 Attribute | Value | Meaning
 --- | --- | ---
-protein_id | INTEGER PRIMARY KEY | The autoincremented ID.
-accession | TEXT
+protein_rowid | INTEGER PRIMARY KEY | The autoincremented ID.
+protein_id | TEXT | this is the `protein_id` field from GenBank records
 contig | TEXT
 gene | INTEGER | The foreign key for the protein sequence
-protein_sequence | TEXT
-length | INTEGER
-product | TEXT
-other_ids | TEXT
+protein_sequence | TEXT | the protein sequence
+length | INTEGER | the length of the translated sequence not including the stop codon
+product | TEXT | the product encoded by the protein
+db_xref | TEXT |
 protein_sequence_md5  | TEXT | the md5sum of the uppercase protein sequence
+EC_number | TEXT |
+genename | TEXT |
+locus_tag | TEXT |
+note | TEXT |
+ribosomal_slippage | TEXT |
+transl_table | TEXT |
+
+
 
 Product is often referred to as function.
 

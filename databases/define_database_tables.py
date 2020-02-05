@@ -21,14 +21,25 @@ def define_genome_table(conn, verbose=False):
 
     conn.execute("""
         CREATE TABLE genome (
-                genome_id INTEGER PRIMARY KEY,
+                genome_rowid INTEGER PRIMARY KEY,
                 identifier TEXT,
                 source_file TEXT, 
                 accession TEXT, 
-                length INTEGER, 
                 name TEXT,
+                description TEXT,
+                source TEXT, 
+                organism TEXT,
+                taxonomy TEXT,
+                collection_date TEXT,
+                country TEXT,
+                db_xref TEXT,
+                host TEXT,
+                isolation_source TEXT,
+                strain TEXT,
+                lab_host TEXT,
                 sequence TEXT, 
-                sequence_md5 TEXT
+                sequence_md5 TEXT,
+                length INTEGER
             )""")
     conn.execute("CREATE UNIQUE INDEX genome_idx1 ON genome(genome_id);")
     conn.execute("CREATE INDEX genome_idx2 ON genome(genome_id, identifier);")
@@ -48,7 +59,7 @@ def define_gene_table(conn, verbose=False):
 
     conn.execute("""
         CREATE TABLE gene (
-            gene_id INTEGER PRIMARY KEY,
+            gene_rowid INTEGER PRIMARY KEY,
             accession TEXT,
             contig TEXT,
             start INTEGER,
@@ -80,15 +91,21 @@ def define_protein_table(conn, verbose=False):
 
     conn.execute("""
         CREATE TABLE protein (
-            protein_id INTEGER PRIMARY KEY,
-            accession TEXT,
+            protein_rowid INTEGER PRIMARY KEY,
+            protein_id TEXT,
             contig TEXT,
             gene INTEGER,
-            protein_sequence TEXT,
-            length INTEGER,
             product TEXT,
-            other_ids TEXT,
-            protein_sequence_md5  TEXT
+            db_xref TEXT,
+            protein_sequence TEXT,
+            protein_sequence_md5  TEXT,
+            length INTEGER,
+            EC_number TEXT, 
+            genename TEXT, 
+            locus_tag TEXT, 
+            note TEXT, 
+            ribosomal_slippage TEXT, 
+            transl_table TEXT
         )""")
     conn.execute("CREATE UNIQUE INDEX protein_idx1 ON protein(protein_id);")
     conn.execute("CREATE INDEX protein_idx2 ON protein(accession, protein_id);")

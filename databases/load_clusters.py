@@ -11,19 +11,7 @@ from Bio import SeqIO
 from formatting import color
 import database_handles
 
-def load_file(gbkf, conn, verbose=True):
-    """
-    Load the sequences from a genbank file
-    :param gbkf: genbank file
-    :param conn: database connection
-    :param verbose: more output
-    :return:
-    """
 
-    for seq_record in SeqIO.parse(open(gbkf, 'r'), "genbank"):
-        print(seq_record.id)
-        print(repr(seq_record.seq))
-        print(len(seq_record))
 
 
 
