@@ -19,7 +19,7 @@ def define_genome_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating GENOME table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE genome (
                 genome_rowid INTEGER PRIMARY KEY,
                 identifier TEXT,
@@ -41,9 +41,9 @@ def define_genome_table(conn, verbose=False):
                 sequence_md5 TEXT,
                 length INTEGER
             )""")
-    conn.execute("CREATE UNIQUE INDEX genome_idx1 ON genome(genome_id);")
-    conn.execute("CREATE INDEX genome_idx2 ON genome(genome_id, identifier);")
-    conn.execute("CREATE INDEX genome_idx3 ON genome(genome_id, accession);")
+    conn.cursor().execute("CREATE UNIQUE INDEX genome_idx1 ON genome(genome_rowid);")
+    conn.cursor().execute("CREATE INDEX genome_idx2 ON genome(genome_rowid, identifier);")
+    conn.cursor().execute("CREATE INDEX genome_idx3 ON genome(genome_rowid, accession);")
     conn.commit()
 
 def define_gene_table(conn, verbose=False):
@@ -57,7 +57,7 @@ def define_gene_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating GENE table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE gene (
             gene_rowid INTEGER PRIMARY KEY,
             accession TEXT,
@@ -68,13 +68,13 @@ def define_gene_table(conn, verbose=False):
             length INTEGER,
             dna_sequence TEXT,
             protein INTEGER,
-            other_ids TEXT,
+            db_xref TEXT,
             dna_sequence_md TEXT
         )""")
-    conn.execute("CREATE UNIQUE INDEX gene_idx1 ON gene(gene_id);")
-    conn.execute("CREATE INDEX gene_idx2 ON gene(accession, gene_id);")
-    conn.execute("CREATE INDEX gene_idx3 ON gene(protein, gene_id);")
-    conn.execute("CREATE INDEX gene_idx4 ON gene(dna_sequence_md, gene_id);")
+    conn.cursor().execute("CREATE UNIQUE INDEX gene_idx1 ON gene(gene_rowid);")
+    conn.cursor().execute("CREATE INDEX gene_idx2 ON gene(accession, gene_rowid);")
+    conn.cursor().execute("CREATE INDEX gene_idx3 ON gene(protein, gene_rowid);")
+    conn.cursor().execute("CREATE INDEX gene_idx4 ON gene(dna_sequence_md, gene_rowid);")
     conn.commit()
 
 
@@ -89,7 +89,7 @@ def define_protein_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating PROTEIN table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE protein (
             protein_rowid INTEGER PRIMARY KEY,
             protein_id TEXT,
@@ -107,12 +107,46 @@ def define_protein_table(conn, verbose=False):
             ribosomal_slippage TEXT, 
             transl_table TEXT
         )""")
-    conn.execute("CREATE UNIQUE INDEX protein_idx1 ON protein(protein_id);")
-    conn.execute("CREATE INDEX protein_idx2 ON protein(accession, protein_id);")
-    conn.execute("CREATE INDEX protein_idx3 ON protein(gene, protein_id);")
-    conn.execute("CREATE INDEX protein_idx4 ON protein(protein_sequence_md5, protein_id);")
-    conn.execute("CREATE INDEX protein_idx5 ON protein(protein_sequence_md5, protein_sequence);")
+    conn.cursor().execute("CREATE UNIQUE INDEX protein_idx1 ON protein(protein_rowid);")
+    conn.cursor().execute("CREATE INDEX protein_idx2 ON protein(protein_id, protein_rowid);")
+    conn.cursor().execute("CREATE INDEX protein_idx3 ON protein(gene, protein_rowid);")
+    conn.cursor().execute("CREATE INDEX protein_idx4 ON protein(protein_sequence_md5, protein_rowid);")
+    conn.cursor().execute("CREATE INDEX protein_idx5 ON protein(protein_sequence_md5, protein_sequence);")
     conn.commit()
+
+def define_trna_table(conn, verbose=False):
+    """
+    Define the tRNA table
+    :param conn: the connection
+    :param verbose: more output
+    :return:
+    """
+
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Creating tRNA table{color.ENDC}\n")
+
+    conn.cursor().execute("""
+        CREATE TABLE trna (
+            trna_rowid INTEGER PRIMARY KEY,
+            accession TEXT,
+            contig TEXT,
+            start INTEGER,
+            end INTEGER,
+            strand INTEGER,
+            dna_sequence TEXT,
+            dna_sequence_md5 TEXT,
+            codon_recognized TEXT,
+            db_xref TEXT,
+            gene TEXT,
+            note TEXT,
+            product TEXT,
+            is_tmRNA INTEGER
+        )
+    """)
+    conn.cursor().execute("CREATE UNIQUE INDEX trna_idx1 ON trna(trna_rowid);")
+    conn.cursor().execute("CREATE INDEX trna_idx2 ON trna(dna_sequence_md5, dna_sequence);")
+    conn.commit()
+
 
 def define_clusterdefinitions_table(conn, verbose=False):
     """
@@ -125,16 +159,16 @@ def define_clusterdefinitions_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating CLUSTERDEFINITION table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE clusterdefinition (
-            clusterdefinition_id INTEGER PRIMARY KEY,
+            clusterdefinition_rowid INTEGER PRIMARY KEY,
             uuid TEXT,
             name TEXT,
             description TEXT,
             command TEXT
         )""")
-    conn.execute("CREATE UNIQUE INDEX clusterdefinition_idx1 ON clusterdefinition(clusterdefinition_id);")
-    conn.execute("CREATE UNIQUE INDEX clusterdefinition_idx2 ON clusterdefinition(clusterdefinition_id, uuid);")
+    conn.cursor().execute("CREATE UNIQUE INDEX clusterdefinition_idx1 ON clusterdefinition(clusterdefinition_rowid);")
+    conn.cursor().execute("CREATE UNIQUE INDEX clusterdefinition_idx2 ON clusterdefinition(clusterdefinition_rowid, uuid);")
     conn.commit()
 
 def define_cluster_table(conn, verbose=False):
@@ -147,19 +181,18 @@ def define_cluster_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating CLUSTER table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE cluster (
-            cluster_id INTEGER PRIMARY KEY,
+            cluster_rowid INTEGER PRIMARY KEY,
             uuid TEXT,
             definition TEXT,
             members TEXT,
             function TEXT,
             altfunction TEXT
         )""")
-    conn.execute("CREATE UNIQUE INDEX cluster_idx1 ON cluster(cluster_id);")
-    conn.execute("CREATE UNIQUE INDEX cluster_idx2 ON cluster(cluster_id, uuid);")
+    conn.cursor().execute("CREATE UNIQUE INDEX cluster_idx1 ON cluster(cluster_rowid);")
+    conn.cursor().execute("CREATE UNIQUE INDEX cluster_idx2 ON cluster(cluster_rowid, uuid);")
     conn.commit()
-
 
 def define_proteinclusters_table(conn, verbose=False):
     """
@@ -171,19 +204,19 @@ def define_proteinclusters_table(conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating PROTEINCLUSTER table{color.ENDC}\n")
 
-    conn.execute("""
+    conn.cursor().execute("""
         CREATE TABLE proteincluster (
-            proteincluster_id INTEGER PRIMARY KEY,
+            proteincluster_rowid INTEGER PRIMARY KEY,
             protein INTEGER NOT NULL,
             cluster INTEGER NOT NULL,
             FOREIGN KEY(protein) REFERENCES protein(protein_id)
             FOREIGN KEY(protein) REFERENCES cluster(cluster_id)
         )""")
-    conn.execute("CREATE UNIQUE INDEX proteincluster_idx1 ON proteincluster(proteincluster_id);")
-    conn.execute("CREATE INDEX proteincluster_idx2 ON proteincluster(proteincluster_id, protein);")
-    conn.execute("CREATE INDEX proteincluster_idx3 ON proteincluster(proteincluster_id, cluster);")
-    conn.execute("CREATE INDEX proteincluster_idx4 ON proteincluster(protein, cluster);")
-    conn.execute("CREATE INDEX proteincluster_idx5 ON proteincluster(cluster, protein);")
+    conn.cursor().execute("CREATE UNIQUE INDEX proteincluster_idx1 ON proteincluster(proteincluster_rowid);")
+    conn.cursor().execute("CREATE INDEX proteincluster_idx2 ON proteincluster(proteincluster_rowid, protein);")
+    conn.cursor().execute("CREATE INDEX proteincluster_idx3 ON proteincluster(proteincluster_rowid, cluster);")
+    conn.cursor().execute("CREATE INDEX proteincluster_idx4 ON proteincluster(protein, cluster);")
+    conn.cursor().execute("CREATE INDEX proteincluster_idx5 ON proteincluster(cluster, protein);")
     conn.commit()
 
 
@@ -198,6 +231,7 @@ def define_all_tables(conn, verbose=False):
     define_genome_table(conn, verbose)
     define_gene_table(conn, verbose)
     define_protein_table(conn, verbose)
+    define_trna_table(conn, verbose)
     define_clusterdefinitions_table(conn, verbose)
     define_cluster_table(conn, verbose)
     define_proteinclusters_table(conn, verbose)
