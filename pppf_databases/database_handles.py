@@ -4,7 +4,7 @@ Create and maintain the connections to the SQLite database
 
 import sys
 import sqlite3
-from formatting import color
+from pppf_lib import color
 
 
 def connect_to_db(dbname, verbose=False):

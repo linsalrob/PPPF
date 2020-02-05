@@ -7,8 +7,8 @@ This is the correct way to do this!
 import sys
 import argparse
 
-from formatting import color
-import database_handles
+from pppf_lib import color
+from pppf_databases import connect_to_db, disconnect
 
 import hashlib
 from Bio import SeqIO
@@ -151,5 +151,6 @@ if __name__ == '__main__':
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
-    conn = database_handles.connect_to_db(args.d, args.v)
+    conn = connect_to_db(args.d, args.v)
     load_genbank_file(args.f, conn, args.v)
+    disconnect(conn, args.v)

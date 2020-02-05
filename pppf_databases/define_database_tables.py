@@ -5,8 +5,8 @@ The SQLite table definitions. See the [Schema](../Schema.md) documentation for m
 import sys
 import argparse
 
-from databases import database_handles
-from formatting import color
+from pppf_databases import database_handles
+from pppf_lib import color
 
 def define_genome_table(conn, verbose=False):
     """

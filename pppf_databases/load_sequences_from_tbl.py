@@ -8,7 +8,7 @@ import os
 import sys
 import argparse
 from formatting import color
-from databases.database_handles import connect_to_db, disconnect
+from pppf_databases.database_handles import connect_to_db, disconnect
 
 def load_sequences(tabf, dbfile, overwrite=False, verbose=False):
     """

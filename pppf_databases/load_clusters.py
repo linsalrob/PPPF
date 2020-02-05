@@ -1,5 +1,5 @@
 """
-Read the clusters from mmseqs and load them into the databases
+Read the clusters from mmseqs and load them into the pppf_databases
 """
 
 import os
