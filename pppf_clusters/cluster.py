@@ -42,7 +42,7 @@ class Cluster:
             self.id = str(uuid4())
         self.exemplar = exemplar
         self.members = set(members)
-        self.members.update(exemplar)
+        self.members.add(exemplar)
         self.longest_id = None
         self.longest_len = None
         self.shortest_id = None
