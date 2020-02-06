@@ -90,8 +90,7 @@ Note that each cluster definition will describe hundreds of clusters
 
 Attribute | Value | Meaning
 --- | --- | ---
-clusterdefinition_id | INTEGER PRIMARY KEY | The autoincremented ID.
-uuid | TEXT | Universal unique ID for this cluster definition
+clusterdefinition_rowid | INTEGER PRIMARY KEY | The autoincremented ID.
 name | TEXT | A short name (no spaces or special characters) for this cluster, suitable for use in a file name
 description | TEXT | A human readable description of this cluster
 command | TEXT | The command line invocation of the cluster
@@ -103,12 +102,21 @@ A `cluster` refers to a specific group of proteins that are somehow related to e
 
 Attribute | Value | Meaning
 --- | --- | ---
-cluster_id | INTEGER PRIMARY KEY | The autoincremented ID.
+cluster_rowid | INTEGER PRIMARY KEY | The autoincremented ID.
 uuid | TEXT | Universal unique ID for this cluster
-definition | TEXT | Foreign key to ClusterDefinitions
-members | TEXT | Comma-separated list of protein accessions (foreign key) for members in this cluster
+clusterdefinition | INTEGER | Foreign key to ClusterDefinitions
+members | TEXT | Comma-separated list of protein accessions for members in this cluster
+exemplar | TEXT | The protein that exemplifies this cluster
+longest_id | TEXT | The id of the longest protein sequence in this cluster
+longest_len | INTEGER | The length of the longest protein sequence in this cluster
+shortest_id | TEXT | The id of the shortest protein sequence in this cluster
+shortest_len | INTEGER | The length of the shortest protein sequence in this cluster
+average_size | REAL | The average size of the proteins in this cluster
+number_of_members | INTEGER | The number of members in this cluster
+functions | TEXT | A JSON format string of the functions and their counts (a dict object)
 function | TEXT | The most likely (abundant) function of the proteins in this cluster.
-altfunctions | TEXT | json format text representing all the functions encoded in this cluster. The format is "function" : "proportion of proteins"
+number_of_functions | INTEGER | The number of (unique) functions in this cluster
+only_hypothetical | INTEGER | Are all the functions in this cluster hypothetical
 
 ## ProteinCluster
 
@@ -116,7 +124,7 @@ The `proteincluster` table holds the connections between *proteins* and *cluster
 
 Attribute | Value | Meaning
 --- | --- | ---
-proteincluster_id | INTEGER PRIMARY KEY | The autoincremented ID.
+proteincluster_rowid | INTEGER PRIMARY KEY | The autoincremented ID.
 protein | INTEGER NOT NULL  | A protein accession. Foreign key to the protein table
 cluster | INTEGER NOT NULL | A cluster UUID. Foreign key to the cluster table
 

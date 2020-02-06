@@ -9,7 +9,7 @@ import argparse
 import pickle
 import jsonpickle
 
-from cluster import Cluster
+from pppf_clusters.cluster import Cluster
 from pppf_databases import connect_to_db
 from pppf_lib import is_hypothetical, color
 

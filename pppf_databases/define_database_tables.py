@@ -162,7 +162,6 @@ def define_clusterdefinitions_table(conn, verbose=False):
     conn.cursor().execute("""
         CREATE TABLE clusterdefinition (
             clusterdefinition_rowid INTEGER PRIMARY KEY,
-            uuid TEXT,
             name TEXT,
             description TEXT,
             command TEXT
@@ -185,10 +184,20 @@ def define_cluster_table(conn, verbose=False):
         CREATE TABLE cluster (
             cluster_rowid INTEGER PRIMARY KEY,
             uuid TEXT,
-            definition TEXT,
+            clusterdefinition INTEGER,
             members TEXT,
-            function TEXT,
-            altfunction TEXT
+            exemplar TEXT, 
+            longest_id TEXT, 
+            longest_len INTEGER, 
+            shortest_id TEXT, 
+            shortest_len INTEGER, 
+            average_size REAL, 
+            number_of_members INTEGER, 
+            functions TEXT, 
+            function TEXT, 
+            number_of_functions INTEGER, 
+            only_hypothetical INTEGER, 
+            FOREIGN KEY (clusterdefinition) REFERENCES clusterdefinition(clusterdefinition_rowid)
         )""")
     conn.cursor().execute("CREATE UNIQUE INDEX cluster_idx1 ON cluster(cluster_rowid);")
     conn.cursor().execute("CREATE UNIQUE INDEX cluster_idx2 ON cluster(cluster_rowid, uuid);")
@@ -209,8 +218,8 @@ def define_proteinclusters_table(conn, verbose=False):
             proteincluster_rowid INTEGER PRIMARY KEY,
             protein INTEGER NOT NULL,
             cluster INTEGER NOT NULL,
-            FOREIGN KEY(protein) REFERENCES protein(protein_id)
-            FOREIGN KEY(protein) REFERENCES cluster(cluster_id)
+            FOREIGN KEY(protein) REFERENCES protein(protein_id),
+            FOREIGN KEY(cluster) REFERENCES cluster(cluster_id)
         )""")
     conn.cursor().execute("CREATE UNIQUE INDEX proteincluster_idx1 ON proteincluster(proteincluster_rowid);")
     conn.cursor().execute("CREATE INDEX proteincluster_idx2 ON proteincluster(proteincluster_rowid, protein);")
