@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     conn = connect_to_db(args.d, args.v)
     clusters = read_mmseqs_clusters(args.t, args.v)
-    clusters = add_functions_to_clusters(clusters, conn, args.v)
+    (clusters, protein_info) = add_functions_to_clusters(clusters, conn, args.v)
     metadata_id = insert_cluster_metadata(conn, args.n, args.s, args.c, args.v)
-    insert_into_database(clusters, conn, metadata_id, args.v)
+    insert_into_database(clusters, conn, metadata_id, protein_info, args.v)
     disconnect(conn, args.v)
