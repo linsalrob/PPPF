@@ -30,7 +30,6 @@ Our cluster tables have these structures:
 """
 
 import sys
-import argparse
 import json
 
 from pppf_databases import connect_to_db, disconnect
@@ -88,10 +87,15 @@ def add_functions_to_clusters(cls, conn, verbose=False):
         sys.stderr.write(f"{color.GREEN}Adding functions to clusters{color.ENDC}\n")
 
     cur = conn.cursor()
+    
+    protein_info = {}
 
-    for clu in cls:
+    cn = len(cls)
+    for cc, clu in enumerate(cls):
+        """
         if verbose:
-            sys.stderr.write(f"{color.PINK}\tCluster {clu.id}{color.ENDC}\n")
+            sys.stderr.write(f"{color.PINK}\tCluster {cc} of {cn}: {clu.id}{color.ENDC}\n")
+        """
 
         plens = []
         fncount = {}
@@ -108,12 +112,13 @@ def add_functions_to_clusters(cls, conn, verbose=False):
         shortestlen = longestlen = len(seq)
 
         for c in clu.members:
-            ex = cur.execute("select product, protein_sequence from protein where protein_id=?", [c])
+            ex = cur.execute("select product, protein_sequence, protein_rowid from protein where protein_id=?", [c])
             tple = ex.fetchone()
             if not tple:
                 sys.stderr.write(f"{color.RED}ERROR retrieving information about {c} from the database{color.ENDC}\n")
                 continue
-            (prdct, seq) = tple
+            (prdct, seq, prid) = tple
+            protein_info[c] = prid
             if len(seq) > longestlen:
                 longestid = c
                 longestlen = len(seq)
@@ -134,7 +139,7 @@ def add_functions_to_clusters(cls, conn, verbose=False):
         clu.function = allfn[0][0]
         clu.is_hypothetical()
 
-    return cls
+    return (cls, protein_info)
 
 
 def insert_cluster_metadata(conn, name, desc, cli, verbose=False):
@@ -160,12 +165,13 @@ def insert_cluster_metadata(conn, name, desc, cli, verbose=False):
     return cd_rowid
 
 
-def insert_into_database(clusters, conn, metadata_id, verbose=False):
+def insert_into_database(clusters, conn, metadata_id, protein_info, verbose=False):
     """
     Insert information into the database
     :param clusters: The array of clusters with their functions
     :param conn: the Database connection
     :param metadata_id: the rowid of the cluster definition table
+    :param protein_info: a dict of [protein id: protein_rowid]
     :param verbose: more output
     :return:
     """
@@ -196,28 +202,17 @@ def insert_into_database(clusters, conn, metadata_id, verbose=False):
         cur.execute(sql, data)
         cluster_id = cur.lastrowid
         for m in c.members:
-            ex = cur.execute("select protein_rowid from protein where protein_id = ?", [m])
-            tple = ex.fetchone()
-            if not tple:
-                sys.stderr.write(f"{color.PINK}Found a protein {m} that does not appear in the protein table{color.ENDC}\n")
-                continue
-            cur.execute("INSERT INTO proteincluster (protein, cluster) VALUES (?,?)", [tple[0], cluster_id])
+            if m not in protein_info:
+                exc = cur.execute("select protein_rowid from protein where protein_id = ?", [m])
+                tple = exc.fetchone()
+                if not tple[0]:
+                    sys.stderr.write(f"{color.RED}No protein info for {m}{color.ENDC}\n")
+                    continue
+                protein_info[m] = tple[0]
+            cur.execute("INSERT INTO proteincluster (protein, cluster) VALUES (?,?)", [protein_info[m], cluster_id])
     conn.commit()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Load the cluster information into the databases')
-    parser.add_argument('-d', help='SQL database', required=True)
-    parser.add_argument('-t', help='Cluster tsv file', required=True)
-    parser.add_argument('-n', help='Cluster name (short text)', required=True)
-    parser.add_argument('-s', help='Cluster description (human readable text)', required=True)
-    parser.add_argument('-c', help='Cluster command line (bash)', required=True)
-    parser.add_argument('-v', help='verbose output', action='store_true')
-    args = parser.parse_args()
 
-    conn = connect_to_db(args.d, args.v)
-    clusters = read_mmseqs_clusters(args.t, args.v)
-    clusters = add_functions_to_clusters(clusters, conn, args.v)
-    metadata_id = insert_cluster_metadata(conn, args.n, args.s, args.c, args.v)
-    insert_into_database(clusters, conn, metadata_id, args.v)
-    disconnect(conn, args.v)
+    sys.stderr.write(f"{color.RED}FATAL: Please use scripts/load_clusters.py to load the clusters\n{color.ENDC}")
