@@ -79,6 +79,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                     if p in feat.qualifiers:
                         prtmtd[p] = "|".join(feat.qualifiers[p])
                 prtmd5 = hashlib.md5(prtmtd['translation'].encode('utf-8')).hexdigest()
+                prtmtd['product'] = prtmtd['product'].lower()
                 sql = """
                     INSERT INTO protein(protein_id, contig, product, db_xref, protein_sequence, protein_sequence_md5, 
                     length, EC_number, genename, locus_tag, note, ribosomal_slippage, transl_table) values 
