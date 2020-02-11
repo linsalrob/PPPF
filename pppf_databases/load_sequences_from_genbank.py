@@ -78,22 +78,30 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 for p in prtmtd:
                     if p in feat.qualifiers:
                         prtmtd[p] = "|".join(feat.qualifiers[p])
-                prtmd5 = hashlib.md5(prtmtd['translation'].encode('utf-8')).hexdigest()
+                prtmd5 = hashlib.md5(prtmtd['translation'].upper().encode('utf-8')).hexdigest()
                 prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
                 sql = """
-                    INSERT INTO protein(protein_id, contig, product, db_xref, protein_sequence, protein_sequence_md5, 
+                    INSERT INTO protein(protein_id, contig, product, db_xref, protein_md5sum, 
                     length, EC_number, genename, locus_tag, note, ribosomal_slippage, transl_table) values 
                     (?,?,?,?,?,?,?,?,?,?,?,?,?)                  
                 """
                 c.execute(sql, [
-                    prtmtd['protein_id'], seq.name, prtmtd['product'], prtmtd['db_xref'], prtmtd['translation'],
+                    prtmtd['protein_id'], seq.name, prtmtd['product'], prtmtd['db_xref'], 
                     prtmd5, len(prtmtd['translation']), prtmtd['EC_number'], prtmtd['gene'], prtmtd['locus_tag'],
                     prtmtd['note'], prtmtd['ribosomal_slippage'], prtmtd['transl_table']
                 ])
 
                 proteinrow = c.lastrowid
+
+                # add the md5sum and sequence if we don't already have it
+                ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", prtmd5)
+                tple = ex.fetchone()
+                if not tple:
+                    c.execute("INSERT INTO protein_md5sum (protein_md5sum, protein_sequence) VALUES (?,?)",
+                              prtmd5, prtmtd['translation'].upper())
+
                 dnaseq = str(feat.extract(seq).seq)
-                dnamd5 = hashlib.md5(dnaseq.encode('utf-8')).hexdigest()
+                dnamd5 = hashlib.md5(dnaseq.upper().encode('utf-8')).hexdigest()
                 sql = """
                     INSERT INTO gene(accession, contig, start, end, strand, dna_sequence, dna_sequence_md, protein, length, db_xref)
                     values (?,?,?,?,?,?,?,?,?,?)
@@ -117,7 +125,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 if feat.type == 'tmRNA':
                     trnmtd['is_tmRNA'] = True
                 dnaseq = str(feat.extract(seq).seq)
-                dnamd5 = hashlib.md5(dnaseq.encode('utf-8')).hexdigest()
+                dnamd5 = hashlib.md5(dnaseq.upper().encode('utf-8')).hexdigest()
                 sql = """
                     INSERT INTO trna(accession, contig, start, end, strand, dna_sequence, dna_sequence_md5, 
                     codon_recognized, db_xref, gene, note, product, is_tmRNA) values (?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -136,7 +144,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                         values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                         """
 
-        seqmd5 = hashlib.md5(str(seq.seq).encode('utf-8')).hexdigest()
+        seqmd5 = hashlib.md5(str(seq.seq).upper().encode('utf-8')).hexdigest()
         tax = "; ".join(seq.annotations['taxonomy'])
 
         c.execute(sql, [seq.id, gbkf, seq.annotations['accessions'][0], seq.name, seq.annotations['source'],

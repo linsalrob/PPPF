@@ -116,6 +116,11 @@ def define_protein_table(conn, verbose=False):
 def define_protein_sequence_table(conn, verbose=False):
     """
     The protein sequence only holds the md5sum and the sequence of the protein.
+
+    Note: the protein -> proteinsequence is a many:one relationship so we
+    can't foreign key back to proteins, but we have a foreign key that points
+    to this table from proteins.
+
     :param conn: the connection
     :param verbose: more output
     :return:
