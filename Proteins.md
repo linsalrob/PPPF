@@ -1,33 +1,8 @@
-# Feature Tables
+# Phage Protein Features
 
-Here we describe the structure of the feature tables that we use in PPPF
+We load all of the phage data into SQLite databases. Those databases are defined using `define_databases.py`. 
 
-An annotation file is converted into a table for downstream analysis.
+Data an be loaded directly from a GenBank file. There are a few conversions that we use:
 
-
-| Column | Contents |
-| --- | --- |
-| 0 | Genome identifier |
-| 1 | Genome source file name |
-| 2 | Genome accession (identifier.version) |
-| 3 |  Genome length |
-| 4 | Genome name |
-| 5 | Protein accession (identifier.version) |
-| 6 | Start location of the feature (bp) |
-| 7 | End location of the feature (bp)
-| 8 | Strand of the feature (-1 \| 0 \| 1) |
-| 9 | Amino acid sequence of the feature if appropriate | 
-| 10 | DNA sequence of the feature |
-| 11 | feature product name |
-| 12 | other feature identifiers (joined with `;`)|
-
-Some of this data is repetitive (e.g. columns 0-4).
-
-# Annotations
-
-We use a simple JSON data structure or SQLite database to store the functional annotations as a hash.
-
-# Cluster data
-
-We store the cluster data in simple sparse matrices.
-
+1. Proteins are stored using the md5sum of the uppercase protein sequence as the ID. When a new protein is added, we don't add it if we already have it in the database. We add a record pointing to that sequence.
+2. Product names (i.e. gene functions) are converted to sentence case: the first letter is capitalized, but all others are not.
