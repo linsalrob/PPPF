@@ -97,8 +97,7 @@ def define_protein_table(conn, verbose=False):
             gene INTEGER,
             product TEXT,
             db_xref TEXT,
-            protein_sequence TEXT,
-            protein_sequence_md5  TEXT,
+            protein_md5sum TEXT,
             length INTEGER,
             EC_number TEXT, 
             genename TEXT, 
@@ -106,13 +105,37 @@ def define_protein_table(conn, verbose=False):
             note TEXT, 
             ribosomal_slippage TEXT, 
             transl_table TEXT
+            FOREIGN KEY (protein_md5sum) REFERENCES protein_sequence(protein_md5sum)
         )""")
     conn.cursor().execute("CREATE UNIQUE INDEX protein_idx1 ON protein(protein_rowid);")
     conn.cursor().execute("CREATE INDEX protein_idx2 ON protein(protein_id, protein_rowid);")
     conn.cursor().execute("CREATE INDEX protein_idx3 ON protein(gene, protein_rowid);")
-    conn.cursor().execute("CREATE INDEX protein_idx4 ON protein(protein_sequence_md5, protein_rowid);")
-    conn.cursor().execute("CREATE INDEX protein_idx5 ON protein(protein_sequence_md5, protein_sequence);")
+    conn.cursor().execute("CREATE INDEX protein_idx4 ON protein(protein_md5sum, protein_rowid);")
     conn.commit()
+
+def define_protein_sequence_table(conn, verbose=False):
+    """
+    The protein sequence only holds the md5sum and the sequence of the protein.
+    :param conn: the connection
+    :param verbose: more output
+    :return:
+    """
+
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Creating protein sequence table{color.ENDC}\n")
+
+    conn.cursor().execute("""
+        CREATE TABLE protein_sequence (
+            proteinsequence_rowid INTEGER PRIMARY KEY,
+            protein_md5sum TEXT,
+            protein_sequence TEXT
+        )
+    """)
+    conn.cursor().execute("CREATE UNIQUE INDEX ps_idx1 ON protein_sequence(proteinsequence_rowid);")
+    conn.cursor().execute("CREATE INDEX ps_idx2 ON protein_sequence(protein_md5, protein_sequence);")
+    conn.cursor().execute("CREATE INDEX ps_idx3 ON protein_sequence(protein_sequence, protein_md5);")
+    conn.commit()
+    
 
 def define_trna_table(conn, verbose=False):
     """
