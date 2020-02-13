@@ -80,10 +80,18 @@ def load_genbank_file(gbkf, conn, verbose=True):
                         prtmtd[p] = "|".join(feat.qualifiers[p])
                 prtmd5 = hashlib.md5(prtmtd['translation'].upper().encode('utf-8')).hexdigest()
                 prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
+                
+                # add the protein sequence and md5sum and sequence if we don't already have it
+                ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", [prtmd5])
+                tple = ex.fetchone()
+                if not tple:
+                    c.execute("INSERT INTO protein_sequence (protein_md5sum, protein_sequence) VALUES (?,?)",
+                              [prtmd5, prtmtd['translation'].upper()])
+
                 sql = """
                     INSERT INTO protein(protein_id, contig, product, db_xref, protein_md5sum, 
                     length, EC_number, genename, locus_tag, note, ribosomal_slippage, transl_table) values 
-                    (?,?,?,?,?,?,?,?,?,?,?,?,?)                  
+                    (?,?,?,?,?,?,?,?,?,?,?,?)                  
                 """
                 c.execute(sql, [
                     prtmtd['protein_id'], seq.name, prtmtd['product'], prtmtd['db_xref'], 
@@ -92,13 +100,6 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 ])
 
                 proteinrow = c.lastrowid
-
-                # add the md5sum and sequence if we don't already have it
-                ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", prtmd5)
-                tple = ex.fetchone()
-                if not tple:
-                    c.execute("INSERT INTO protein_md5sum (protein_md5sum, protein_sequence) VALUES (?,?)",
-                              prtmd5, prtmtd['translation'].upper())
 
                 dnaseq = str(feat.extract(seq).seq)
                 dnamd5 = hashlib.md5(dnaseq.upper().encode('utf-8')).hexdigest()

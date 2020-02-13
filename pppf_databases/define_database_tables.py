@@ -104,7 +104,7 @@ def define_protein_table(conn, verbose=False):
             locus_tag TEXT, 
             note TEXT, 
             ribosomal_slippage TEXT, 
-            transl_table TEXT
+            transl_table TEXT,
             FOREIGN KEY (protein_md5sum) REFERENCES protein_sequence(protein_md5sum)
         )""")
     conn.cursor().execute("CREATE UNIQUE INDEX protein_idx1 ON protein(protein_rowid);")
@@ -131,14 +131,15 @@ def define_protein_sequence_table(conn, verbose=False):
 
     conn.cursor().execute("""
         CREATE TABLE protein_sequence (
-            proteinsequence_rowid INTEGER PRIMARY KEY,
+            protein_sequence_rowid INTEGER PRIMARY KEY,
             protein_md5sum TEXT,
             protein_sequence TEXT
         )
     """)
-    conn.cursor().execute("CREATE UNIQUE INDEX ps_idx1 ON protein_sequence(proteinsequence_rowid);")
-    conn.cursor().execute("CREATE INDEX ps_idx2 ON protein_sequence(protein_md5, protein_sequence);")
-    conn.cursor().execute("CREATE INDEX ps_idx3 ON protein_sequence(protein_sequence, protein_md5);")
+    conn.cursor().execute("CREATE UNIQUE INDEX ps_idx0 ON protein_sequence(protein_md5sum);")
+    conn.cursor().execute("CREATE UNIQUE INDEX ps_idx1 ON protein_sequence(protein_sequence_rowid);")
+    conn.cursor().execute("CREATE INDEX ps_idx2 ON protein_sequence(protein_md5sum, protein_sequence);")
+    conn.cursor().execute("CREATE INDEX ps_idx3 ON protein_sequence(protein_sequence, protein_md5sum);")
     conn.commit()
     
 
@@ -273,6 +274,7 @@ def define_all_tables(conn, verbose=False):
     define_clusterdefinitions_table(conn, verbose)
     define_cluster_table(conn, verbose)
     define_proteinclusters_table(conn, verbose)
+    define_protein_sequence_table(conn, verbose)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create tables for a database')
