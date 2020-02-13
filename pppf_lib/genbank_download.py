@@ -8,11 +8,11 @@ This is a replacement for the snakemake download which doesn't work properly!
 import os
 import sys
 from pppf_lib import color
-from Bio import Entrez
+from pppf_lib import GenBank
 
 __author__ = 'Rob Edwards'
 
-class GenBankDownload:
+class GenBankDownload(GenBank):
     """
     A genbank download object. This has a directory to store the results
     and a list of accessions to retrieve.
@@ -24,26 +24,12 @@ class GenBankDownload:
         Initialize the object.
         """
 
-        if email:
-            Entrez.email = email
-        else:
-            raise Exception("Please provide an email to the Entrez application")
-
-
-        if api_key:
-            Entrez.api_key = api_key
-        else:
-            raise Exception("Please provide an api_key to the Entrez application")
+        GenBank.__init__(self, email, api_key, **kwargs)
 
         self.accessions = accessions
         self.directory = directory
         self.outputfile = outputfile
 
-        self.verbose = kwargs.get('verbose', False)
-        self.db = kwargs.get('db', 'nuccore')
-        self.rettype = kwargs.get('rettype', 'gb')
-        self.retmode = kwargs.get('retmode', 'text')
-        self.number_of_requests = kwargs.get('self.number_of_requests', 500)
 
     def chunk_accessions(self):
         """
@@ -65,7 +51,7 @@ class GenBankDownload:
         for acc in self.chunk_accessions():
             if self.verbose:
                 sys.stderr.write(f"{color.GREEN}Getting {acc}{color.ENDC}\n")
-            handle = Entrez.efetch(id=",".join(acc), 
+            handle = self.entrez.efetch(id=",".join(acc), 
                                    db=self.db, 
                                    rettype=self.rettype, 
                                    retmode=self.retmode)
