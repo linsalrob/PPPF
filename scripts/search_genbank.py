@@ -41,6 +41,7 @@ def search_to_ids(term, outfile=None, verbose=False):
         'email': email,
         'verbose': verbose,
         'term': term, 
+        'rettype' : "acc",
     }
 
     if verbose:
@@ -67,7 +68,7 @@ def search_to_ids(term, outfile=None, verbose=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=' ')
-    parser.add_argument('-t', help='term to search for ', required=True)
+    parser.add_argument('-t', help='term to search for. For example \'"gbdiv_PHG"[prop] AND "complete"[Properties]\'', required=True)
     parser.add_argument('-o', help='output file')
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
