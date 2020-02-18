@@ -36,6 +36,9 @@ class GenBankDownload(GenBank):
         Split the list into the number of elements to request
         """
         for i in range(0, len(self.accessions), self.number_of_requests):
+            if self.verbose:
+                sys.stderr.write(f"{color.PINK}Chunk {i}-{i+self.number_of_requests}{color.ENDC}\n")
+
             yield self.accessions[i:i+self.number_of_requests]
 
     def download(self):
@@ -51,11 +54,16 @@ class GenBankDownload(GenBank):
         for acc in self.chunk_accessions():
             if self.verbose:
                 sys.stderr.write(f"{color.GREEN}Getting {acc}{color.ENDC}\n")
-            handle = self.entrez.efetch(id=",".join(acc), 
-                                   db=self.db, 
-                                   rettype=self.rettype, 
-                                   retmode=self.retmode)
-            out.write(handle.read())
+            
+            try:
+                handle = self.entrez.efetch(id=",".join(acc), 
+                                       db=self.db, 
+                                       rettype=self.rettype, 
+                                       retmode=self.retmode)
+                out.write(handle.read())
+            except http.client.IncompleteRead as e:
+                sys.stderr.write(f"{color.RED}Incomplete read{color.ENDC}\n")
+                out.write(handle.read())
         out.close()
 
 
