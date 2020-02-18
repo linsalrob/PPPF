@@ -35,7 +35,7 @@ class GenBank():
         self.db = kwargs.get('db', 'nuccore')
         self.rettype = kwargs.get('rettype', 'gb')
         self.retmode = kwargs.get('retmode', 'text')
-        self.number_of_requests = kwargs.get('self.number_of_requests', 500)
+        self.number_of_requests = kwargs.get('self.number_of_requests', 100)
         self.verbose = kwargs.get('verbose', False)
 
 
