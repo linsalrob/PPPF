@@ -79,7 +79,10 @@ def load_genbank_file(gbkf, conn, verbose=True):
                     if p in feat.qualifiers:
                         prtmtd[p] = "|".join(feat.qualifiers[p])
                 prtmd5 = hashlib.md5(prtmtd['translation'].upper().encode('utf-8')).hexdigest()
-                prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
+                if ['product'] in prtmtd:
+                    prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
+                else:
+                    prtmtd['product'] = "Hypothetical protein"
                 
                 # add the protein sequence and md5sum and sequence if we don't already have it
                 ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", [prtmd5])
