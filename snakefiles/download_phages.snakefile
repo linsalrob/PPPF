@@ -22,14 +22,19 @@ GENOMEDIR = config['directories']['genomes']
 USERID = config['userid']
 DATABASE = config['database']
 
+# do we want verbose output? Set the verbose setting to true
+VERBOSE = ""
+if 'verbose' in config and config['verbose']:
+    VERBOSE="-v"
+
 phage_term = '"gbdiv_PHG"[prop] AND "complete"[Properties]'
 
 todaysdate = date.today().strftime('%Y%m%d')
 
 
 def find_genbank_files(wildcards):
-    GBKS, = glob_wildcards(join(GENOMEDIR, f'{todaysdate}.files', '{gbk}.gbk')),
-    g = expand(join(GENOMEDIR, f"{todaysdate}.files", "{gbk}.gbk"), gbk=GBKS)
+    GBKS, = glob_wildcards(join(GENOMEDIR, '{gbk}.gbk')),
+    g = expand(join(GENOMEDIR, "{gbk}.gbk"), gbk=GBKS)
     return g
 
 
@@ -92,11 +97,11 @@ rule create_databases:
     Create the SQL database and load the sequence data
     """
     
-    input:
-        join(GENOMEDIR, f"{todaysdate}.files")
-    params:
-        find_genbank_files
     output:
-        f"{todaysdate}.sql"
+        database = DATABASE
+    params:
+        verbose = VERBOSE
     shell:
-        "python3 ~/GitHubs/PPPF/scripts/create_databases.py -f {params} -d {output} -v"
+        "python3 ~/GitHubs/PPPF/scripts/create_databases.py -d {output.database} {params.verbose}"
+
+#rule load_database:
