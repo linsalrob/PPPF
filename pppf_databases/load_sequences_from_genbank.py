@@ -79,7 +79,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                     if p in feat.qualifiers:
                         prtmtd[p] = "|".join(feat.qualifiers[p])
                 prtmd5 = hashlib.md5(prtmtd['translation'].upper().encode('utf-8')).hexdigest()
-                if ['product'] in prtmtd:
+                if 'product' in prtmtd:
                     prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
                 else:
                     prtmtd['product'] = "Hypothetical protein"
