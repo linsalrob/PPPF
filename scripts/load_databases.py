@@ -13,7 +13,7 @@ from pppf_databases import load_genbank_file, connect_to_db, disconnect, define_
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Create a database and load it with GenBank data")
-    parser.add_argument('-f', help='genbank file to load', nargs="+", action='append')
+    parser.add_argument('-f', help='genbank file to load', nargs="+", required=True)
     parser.add_argument('-d', help='SQL database', required=True)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
