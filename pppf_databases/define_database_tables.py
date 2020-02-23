@@ -44,6 +44,7 @@ def define_genome_table(conn, verbose=False):
     conn.cursor().execute("CREATE UNIQUE INDEX genome_idx1 ON genome(genome_rowid);")
     conn.cursor().execute("CREATE INDEX genome_idx2 ON genome(genome_rowid, identifier);")
     conn.cursor().execute("CREATE INDEX genome_idx3 ON genome(genome_rowid, accession);")
+    conn.cursor().execute("CREATE INDEX genome_idx4 ON genome(accession, identifier);")
     conn.commit()
 
 def define_gene_table(conn, verbose=False):
