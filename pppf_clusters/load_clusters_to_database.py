@@ -102,30 +102,30 @@ def add_functions_to_clusters(cls, conn, verbose=False):
 
         # note we retrieve the information for the exemplar first and
         # then if it is the longest/shortest it remains that way
-        ex = cur.execute("select product, protein_sequence from protein where protein_id=?", [clu.exemplar])
+        ex = cur.execute("select product, length from protein where protein_id=?", [clu.exemplar])
         tple = ex.fetchone()
         if not tple:
             sys.stderr.write(f"{color.RED}ERROR retrieving information about cluster exemplar {clu.exemplar} from the database.\nCan't continue{color.ENDC}\n")
             sys.exit(-1)
-        (prdct, seq) = tple
+        (prdct, seqlen) = tple
         shortestid = longestid = clu.exemplar
-        shortestlen = longestlen = len(seq)
+        shortestlen = longestlen = seqlen
 
         for c in clu.members:
-            ex = cur.execute("select product, protein_sequence, protein_rowid from protein where protein_id=?", [c])
+            ex = cur.execute("select product, length, protein_rowid from protein where protein_id=?", [c])
             tple = ex.fetchone()
             if not tple:
                 sys.stderr.write(f"{color.RED}ERROR retrieving information about {c} from the database{color.ENDC}\n")
                 continue
-            (prdct, seq, prid) = tple
+            (prdct, seqlen, prid) = tple
             protein_info[c] = prid
-            if len(seq) > longestlen:
+            if seqlen > longestlen:
                 longestid = c
-                longestlen = len(seq)
-            if len(seq) < shortestlen:
+                longestlen = seqlen
+            if seqlen < shortestlen:
                 shortestid = c
-                shortestlen = len(seq)
-            plens.append(len(seq))
+                shortestlen = seqlen
+            plens.append(seqlen)
             fncount[prdct] = fncount.get(prdct, 0) + 1
         clu.longest_id = longestid
         clu.longest_len = longestlen
