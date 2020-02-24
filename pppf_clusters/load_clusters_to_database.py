@@ -24,7 +24,7 @@ Our cluster tables have these structures:
             proteincluster_rowid INTEGER PRIMARY KEY,
             protein INTEGER NOT NULL,
             cluster INTEGER NOT NULL,
-            FOREIGN KEY(protein) REFERENCES protein(protein_id)
+            FOREIGN KEY(protein) REFERENCES protein(protein_rowid)
             FOREIGN KEY(protein) REFERENCES cluster(cluster_id)
 
 """
@@ -102,7 +102,7 @@ def add_functions_to_clusters(cls, conn, verbose=False):
 
         # note we retrieve the information for the exemplar first and
         # then if it is the longest/shortest it remains that way
-        ex = cur.execute("select product, length from protein where protein_id=?", [clu.exemplar])
+        ex = cur.execute("select product, length from protein where protein_md5sum=?", [clu.exemplar])
         tple = ex.fetchone()
         if not tple:
             sys.stderr.write(f"{color.RED}ERROR retrieving information about cluster exemplar {clu.exemplar} from the database.\nCan't continue{color.ENDC}\n")
@@ -112,7 +112,7 @@ def add_functions_to_clusters(cls, conn, verbose=False):
         shortestlen = longestlen = seqlen
 
         for c in clu.members:
-            ex = cur.execute("select product, length, protein_rowid from protein where protein_id=?", [c])
+            ex = cur.execute("select product, length, protein_rowid from protein where protein_md5sum=?", [c])
             tple = ex.fetchone()
             if not tple:
                 sys.stderr.write(f"{color.RED}ERROR retrieving information about {c} from the database{color.ENDC}\n")
@@ -203,7 +203,7 @@ def insert_into_database(clusters, conn, metadata_id, protein_info, verbose=Fals
         cluster_id = cur.lastrowid
         for m in c.members:
             if m not in protein_info:
-                exc = cur.execute("select protein_rowid from protein where protein_id = ?", [m])
+                exc = cur.execute("select protein_rowid from protein where protein_md5sum = ?", [m])
                 tple = exc.fetchone()
                 if not tple[0]:
                     sys.stderr.write(f"{color.RED}No protein info for {m}{color.ENDC}\n")
