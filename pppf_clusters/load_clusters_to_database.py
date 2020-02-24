@@ -113,20 +113,23 @@ def add_functions_to_clusters(cls, conn, verbose=False):
 
         for c in clu.members:
             ex = cur.execute("select product, length, protein_rowid from protein where protein_md5sum=?", [c])
-            tple = ex.fetchone()
-            if not tple:
-                sys.stderr.write(f"{color.RED}ERROR retrieving information about {c} from the database{color.ENDC}\n")
-                continue
-            (prdct, seqlen, prid) = tple
-            protein_info[c] = prid
-            if seqlen > longestlen:
-                longestid = c
-                longestlen = seqlen
-            if seqlen < shortestlen:
-                shortestid = c
-                shortestlen = seqlen
-            plens.append(seqlen)
-            fncount[prdct] = fncount.get(prdct, 0) + 1
+            for tple in ex.fetchall():
+                if not tple:
+                    sys.stderr.write(f"{color.RED}ERROR retrieving information about {c} from the database{color.ENDC}\n")
+                    continue
+                (prdct, seqlen, prid) = tple
+                # we only save one row id.
+                # this should probably refer to the protein_sequence table
+                # now we are using md5sums
+                protein_info[c] = prid
+                if seqlen > longestlen:
+                    longestid = c
+                    longestlen = seqlen
+                if seqlen < shortestlen:
+                    shortestid = c
+                    shortestlen = seqlen
+                plens.append(seqlen)
+                fncount[prdct] = fncount.get(prdct, 0) + 1
         clu.longest_id = longestid
         clu.longest_len = longestlen
         clu.shortest_id = shortestid
