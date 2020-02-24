@@ -74,13 +74,22 @@ def load_genbank_file(gbkf, conn, verbose=True):
                         # we handle this separately as we want them all
                         srcmtd['db_xref'] = "|".join(feat.qualifiers['db_xref'])
             if feat.type == 'CDS':
+                # if there is no protein sequence (yes, there are some genbank records with no protein sequence)
+                # we don't continue
+                if len(prtmtd['translation']) == 0:
+                    sys.stderr.write("SKIPPED: No translation for prtmtd['protein_id']\n")
+                    continue
+
                 (start, stop, strand) = (feat.location.start.position, feat.location.end.position, feat.strand)
                 for p in prtmtd:
                     if p in feat.qualifiers:
                         prtmtd[p] = "|".join(feat.qualifiers[p])
                 prtmd5 = hashlib.md5(prtmtd['translation'].upper().encode('utf-8')).hexdigest()
                 if 'product' in prtmtd:
-                    prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
+                    if len(prtmtd['product']) > 1:
+                        prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
+                    elif len(prtmtd['prodcut']) == 0:
+                        prtmtd['product'] = "Hypothetical protein"
                 else:
                     prtmtd['product'] = "Hypothetical protein"
                 
