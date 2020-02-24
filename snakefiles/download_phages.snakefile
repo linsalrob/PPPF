@@ -7,13 +7,15 @@ This is based in part on the snakemake genbank help:
 This doesn't include some other genomes identified by Andrew Millard, but
 I add those separately later
 
-Note that I originally wrote this using the snakemake remote handler,
-but that is very buggy and slow, and so I wrapped my own
-using BioPython.
+I have tried a couple of versions of this (you can see them in the file
+history on git), but settled on the eutils version. It adds a dependency
+but is way cleaner and faster than either snakemakes NCBI handler
+or BioPython
 
 """
 
-from os.path import join
+import os
+import sys
 from datetime import date
 
 
@@ -21,6 +23,26 @@ configfile: 'process_phages.json'
 GENOMEDIR = config['directories']['genomes']
 USERID = config['userid']
 DATABASE = config['database']
+
+
+os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
+# we don't include this as a rule because if the database
+# does not exist, the initial load takes a long time
+# and we want you to do it!
+
+if not os.path.exists(DATABASE):
+    sys.stderr.write(f"WARNING: {DATABASE} does not exist\n")
+    sys.stderr.write("""
+If this is the first time you are running the code, please make the
+database and populate it with genbank data. Alternatively, you
+can download a preloaded version of the database from Rob's
+website which will save you a day or two!
+
+To create the database use:
+        python3 ~/GitHubs/PPPF/scripts/create_databases.py -d phages.sql -v
+You can continue from there and we'll add all the data
+                     """)
+    sys.exit(0)
 
 # do we want verbose output? Set the verbose setting to true
 VERBOSE = ""
@@ -32,15 +54,10 @@ phage_term = '"gbdiv_PHG"[prop] AND "complete"[Properties]'
 todaysdate = date.today().strftime('%Y%m%d')
 
 
-def find_genbank_files(wildcards):
-    GBKS, = glob_wildcards(join(GENOMEDIR, '{gbk}.gbk')),
-    g = expand(join(GENOMEDIR, "{gbk}.gbk"), gbk=GBKS)
-    return g
-
 
 rule all:
     input:
-        f"{todaysdate}.phage_accessions.txt"
+        f"{todaysdate}.dbupdated"
 
 
 rule eutils_phage_accessions:
@@ -54,19 +71,18 @@ rule eutils_phage_accessions:
     shell:
         "esearch -query '{params.term}' -db nuccore | efetch -format docsum | xtract -pattern DocumentSummary -element Id AccessionVersion > {output}"
 
-rule biopython_search_accessions:
+rule new_genomes_only:
     """
-    Create a list of all the accessions to download.
-
-    This rule is deprecated in favor of the eutils approach.
-    Two reasons:
-        i.  This rule only downloads the Gi which is (a) deprecated and (b) not a part of the genbank record
-        ii. This was breaking somehow
+    Find which genomes are new, and which are already in the database.
+    Ignore those in the db
     """
+    input:
+        f"{todaysdate}.phage_accessions.txt"
     output:
-        f"{todaysdate}.biopython.phage_accessions.txt"
+        f"{todaysdate}.new_genomes.txt"
     shell:
-        "python ~/GitHubs/PPPF/scripts/search_genbank.py -t '{phage_term}' -o {output}"
+        "python3 /home3/redwards/GitHubs/PPPF/scripts/phage_new_genomes.py -f {input} -d {DATABASE} -o {output} {VERBOSE}"
+
 
 rule download_genomes:
     """
@@ -74,34 +90,20 @@ rule download_genomes:
     """
 
     input:
-        f"{todaysdate}.phage_accessions.txt"
+        f"{todaysdate}.new_genomes.txt"
     output:
-        join(GENOMEDIR, f"{todaysdate}.sequences.gb")
+        os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
     shell:
         "python3 ~/GitHubs/PPPF/scripts/download_genbank_files.py -f {input} -o {output}"
 
-rule split_genomes:
+
+rule load_database:
     """
-    Separate the genbank files into multiple files
+    Load the genbank data into the database
     """
     input:
-        join(GENOMEDIR, f"{todaysdate}.sequences.gb")
+        os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
     output:
-        directory(join(GENOMEDIR, f"{todaysdate}.files"))
+        f"{todaysdate}.dbupdated"
     shell:
-        "python3 ~/bin/separate_multigenbank.py -f {input} -d {output}"
-
-
-rule create_databases:
-    """
-    Create the SQL database and load the sequence data
-    """
-    
-    output:
-        database = DATABASE
-    params:
-        verbose = VERBOSE
-    shell:
-        "python3 ~/GitHubs/PPPF/scripts/create_databases.py -d {output.database} {params.verbose}"
-
-#rule load_database:
+        "python3 /home3/redwards/GitHubs/PPPF/scripts/load_databases.py -d {DATABASE} -f {input} -v > {output}"
