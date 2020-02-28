@@ -272,7 +272,7 @@ def define_phage_tables(conn, verbose=False):
     define_gene_table(conn, verbose)
     define_protein_table(conn, verbose)
     define_trna_table(conn, verbose)
-
+    define_protein_sequence_table(conn, verbose)
 
 def define_cluster_tables(conn, verbose=False):
     """
@@ -285,7 +285,7 @@ def define_cluster_tables(conn, verbose=False):
     define_clusterdefinitions_table(conn, verbose)
     define_cluster_table(conn, verbose)
     define_proteinclusters_table(conn, verbose)
-    define_protein_sequence_table(conn, verbose)
+
 
 
 if __name__ == '__main__':
