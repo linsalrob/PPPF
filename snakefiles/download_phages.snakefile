@@ -22,7 +22,8 @@ from datetime import date
 configfile: 'process_phages.json'
 GENOMEDIR = config['directories']['genomes']
 USERID = config['userid']
-DATABASE = config['database']
+PHAGE_DATABASE = config['phage_database']
+CLUSTER_DATABASE = config['cluster_database']
 
 
 os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
@@ -30,8 +31,8 @@ os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
 # does not exist, the initial load takes a long time
 # and we want you to do it!
 
-if not os.path.exists(DATABASE):
-    sys.stderr.write(f"WARNING: {DATABASE} does not exist\n")
+if not os.path.exists(PHAGE_DATABASE) or not os.path..exists(CLUSTER_DATABASE):
+    sys.stderr.write(f"WARNING: {PHAGE_DATABASE} or {CLUSTER_DATABASE} does not exist\n")
     sys.stderr.write("""
 If this is the first time you are running the code, please make the
 database and populate it with genbank data. Alternatively, you
@@ -39,7 +40,7 @@ can download a preloaded version of the database from Rob's
 website which will save you a day or two!
 
 To create the database use:
-        python3 ~/GitHubs/PPPF/scripts/create_databases.py -d phages.sql -v
+        python3 ~/GitHubs/PPPF/scripts/create_databases.py -p phages.sql -c clusters.sql -v
 You can continue from there and we'll add all the data
                      """)
     sys.exit(0)
@@ -81,7 +82,7 @@ rule new_genomes_only:
     output:
         f"{todaysdate}.new_genomes.txt"
     shell:
-        "python3 /home3/redwards/GitHubs/PPPF/scripts/phage_new_genomes.py -f {input} -d {DATABASE} -o {output} {VERBOSE}"
+        "python3 /home3/redwards/GitHubs/PPPF/scripts/phage_new_genomes.py -f {input} -p {PHAGE_DATABASE} -o {output} {VERBOSE}"
 
 
 rule download_genomes:
@@ -106,4 +107,4 @@ rule load_database:
     output:
         f"{todaysdate}.dbupdated"
     shell:
-        "python3 /home3/redwards/GitHubs/PPPF/scripts/load_databases.py -d {DATABASE} -f {input} -v > {output}"
+        "python3 /home3/redwards/GitHubs/PPPF/scripts/load_databases.py -p {PHAGE_DATABASE} -f {input} -v > {output}"

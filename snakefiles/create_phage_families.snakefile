@@ -13,7 +13,8 @@ from datetime import date
 configfile: 'process_phages.json'
 GENOMEDIR = config['directories']['genomes']
 USERID = config['userid']
-DATABASE = config['database']
+PHAGE_DATABASE = config['phage_database']
+CLUSTER_DATABASE = config['cluster_database']
 CLUSTERDIR = config['directories']['clusters']
 
 # we define this as a variable as we do not want it cleaned up
@@ -22,11 +23,18 @@ if not os.path.exists(TMPDIR):
     os.mkdir(TMPDIR)
 
 
-if not os.path.exists(DATABASE):
-    sys.stderr.write(f"FATAL: {DATABASE} not found.\n")
+if not os.path.exists(PHAGE_DATABASE):
+    sys.stderr.write(f"FATAL: {PHAGE_DATABASE} not found.\n")
     sys.stderr.write(f"Please see snakefiles/download_phages.snakefile")
     sys.stderr.write("To make and install the databases\n")
     sys.exit(0)
+
+if not os.path.exists(CLUSTER_DATABASE):
+    sys.stderr.write(f"FATAL: {CLUSTER_DATABASE} not found.\n")
+    sys.stderr.write(f"Please see snakefiles/download_phages.snakefile")
+    sys.stderr.write("To make and install the databases\n")
+    sys.exit(0)
+
 
 
 # do we want verbose output? Set the verbose setting to true
@@ -120,5 +128,5 @@ rule load_database:
         out = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload")
     shell:
         """
-        python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -d {DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -c 'create_phage_families.snakefile' {VERBOSE} > {output.out}
+        python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -c 'create_phage_families.snakefile' {VERBOSE} > {output.out}
         """

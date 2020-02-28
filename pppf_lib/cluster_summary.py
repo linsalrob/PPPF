@@ -66,17 +66,19 @@ def cluster_is_hypothetical(cl, verbose=False):
 
 
 
-def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
+def enrich_a_cluster(clid, mems, phagedb, exout=None, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param clid: cluster id
     :param mems: the members of the cluster
-    :param cur: the database connection cursor
+    :param phagedb: the phage genome sqlite file
     :param exout: extended output file. If you want to add more data to the clusters (e.g. functions and lengths)
     :param verbose: more output
     :return: the modified cluster object
     """
 
+    conn = connect_to_db(phagedb, verbose)
+    cur = conn.cursor()
 
     lens = []
     shortest = [None, 10000]
@@ -115,11 +117,10 @@ def enrich_a_cluster(clid, mems, cur, exout=None, verbose=False):
     return shortest[0], shortest[1], longest[0], longest[1], functions, sum(lens)/len(lens)
 
 
-def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
+def enrich_cluster_data(cls, summf, exout=None, verbose=False):
     """
     Extract some information about each cluster and add it to the Cluster object
     :param cls: the cluster object
-    :param dbf: the database file
     :param summf: the summary file to write
     :param verbose: more output
     :return: the modified cluster object
@@ -127,10 +128,6 @@ def enrich_cluster_data(cls, dbf, summf, exout=None, verbose=False):
 
     updatedcls = []
 
-    conn = connect_to_db(dbf, verbose)
-    if not conn:
-        sys.stderr.write(f"{color.RED}Could not connect to database {dbf}{color.ENDC}\n")
-        sys.exit(-1)
 
     if verbose:
         sys.stderr.write(f"{color.GREEN}Adding summary data{color.ENDC}\n")
@@ -190,7 +187,7 @@ def json_cluster_data(cl, jf, verbose=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize a set of clusters from mmseqs (or elsewhere)')
     parser.add_argument('-t', help='mmseqs format tsv file of clusters')
-    parser.add_argument('-d', help='sqlite database file', required=True)
+    parser.add_argument('-d', help='phage SQLite database file', required=True)
     parser.add_argument('-s', help='summary file to write', required=True)
     parser.add_argument('-p', help='pickle file to write with enriched cluster information')
     parser.add_argument('-e', help='enriched cluster output file')
@@ -204,7 +201,7 @@ if __name__ == '__main__':
     else:
         sys.stderr.write(f"{color.RED}Please provide a cluster file{color.ENDC}\n")
 
-    newclusters = enrich_cluster_data(clusters, args.d, args.s, args.e, args.v)
+    newclusters = enrich_cluster_data(clusters, args.s, args.e, args.v)
 
     if args.p:
         pickle_cluster_data(newclusters, args.p, args.v)

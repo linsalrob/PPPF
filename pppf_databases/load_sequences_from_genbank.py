@@ -170,10 +170,10 @@ def load_genbank_file(gbkf, conn, verbose=True):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load genbank data into an SQLite table')
     parser.add_argument('-f', help='GenBank file to parse', required=True)
-    parser.add_argument('-d', help='SQLite database', required=True)
+    parser.add_argument('-p', help='Phage SQLite database', required=True)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
-    conn = connect_to_db(args.d, args.v)
+    conn = connect_to_db(args.p, args.v)
     load_genbank_file(args.f, conn, args.v)
     disconnect(conn, args.v)

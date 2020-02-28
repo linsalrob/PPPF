@@ -20,7 +20,7 @@ __author__ = 'Rob Edwards'
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find new accesssions')
     parser.add_argument('-f', help='input file of [gi, accession number]', required=True)
-    parser.add_argument('-d', help='phage database', required=True)
+    parser.add_argument('-p', help='phage database', required=True)
     parser.add_argument('-o', help='file to write needed IDs to', required=True)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # Thus identifier = AF068845.1 and accession = AF068845
     # We probably want identifier!
 
-    con = connect_to_db(args.d, args.v)
+    con = connect_to_db(args.p, args.v)
     exc = con.cursor().execute("select identifier, accession from genome")
     ids = {}
     accs = {}

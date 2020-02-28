@@ -13,12 +13,12 @@ from pppf_lib import color
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load the cluster information into the databases')
-    parser.add_argument('-d', help='SQL database', required=True)
+    parser.add_argument('-c', help='Cluster SQLite database', required=True)
     parser.add_argument('-t', help='Cluster tsv file', required=True)
     parser.add_argument('-v', help='verbose output', default=True, action='store_true')
     args = parser.parse_args()
 
-    conn = connect_to_db(args.d, args.v)
+    conn = connect_to_db(args.c, args.v)
     clusters = read_mmseqs_clusters(args.t, args.v)
     for clu in clusters:
         print(f"{color.PINK}\tCluster {clu.id}{color.ENDC}")

@@ -74,11 +74,11 @@ def read_mmseqs_clusters(clf, verbose=False):
     return cls
 
 
-def add_functions_to_clusters(cls, conn, verbose=False):
+def add_functions_to_clusters(cls, phageconn, verbose=False):
     """
     Add the protein functions to the clusters.
     :param cls: The list of clusters
-    :param conn: The database connection
+    :param phageconn: The phage database connection
     :param verbose: More output
     :return: A modified list of cluster objects that includes the functions
     """
@@ -86,7 +86,7 @@ def add_functions_to_clusters(cls, conn, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Adding functions to clusters{color.ENDC}\n")
 
-    cur = conn.cursor()
+    cur = phageconn.cursor()
     
     protein_info = {}
 
@@ -145,11 +145,11 @@ def add_functions_to_clusters(cls, conn, verbose=False):
     return (cls, protein_info)
 
 
-def insert_cluster_metadata(conn, name, desc, cli, verbose=False):
+def insert_cluster_metadata(clconn, name, desc, cli, verbose=False):
     """
     Insert the cluster metadata information in the SQL table and return its rowid.
     This is the information that describes how the clusters were made.
-    :param conn: the database connection
+    :param clconn: the database connection
     :param name: the name of the clustering approach
     :param desc: a human readable description of the clustering
     :param cli: the command line command used for the clustering
@@ -160,19 +160,20 @@ def insert_cluster_metadata(conn, name, desc, cli, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Adding the metadata{color.ENDC}\n")
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO clusterdefinition(name, description, command) values (?,?,?)",
+    clcur = clconn.cursor()
+    clcur.execute("INSERT INTO clusterdefinition(name, description, command) values (?,?,?)",
                 [name, desc, cli])
-    cd_rowid = cur.lastrowid
-    conn.commit()
+    cd_rowid = clcur.lastrowid
+    clconn.commit()
     return cd_rowid
 
 
-def insert_into_database(clusters, conn, metadata_id, protein_info, verbose=False):
+def insert_into_database(clusters, clconn, phageconn, metadata_id, protein_info, verbose=False):
     """
     Insert information into the database
     :param clusters: The array of clusters with their functions
-    :param conn: the Database connection
+    :param clconn: the clusters database connection
+    :param phageconn: the phage database connection
     :param metadata_id: the rowid of the cluster definition table
     :param protein_info: a dict of [protein id: protein_rowid]
     :param verbose: more output
@@ -188,7 +189,8 @@ def insert_into_database(clusters, conn, metadata_id, protein_info, verbose=Fals
         sys.stderr.write(f"{color.RED}FATAL: There is no shortest id for the first cluster. Was the seq info added?{color.ENDC}\n")
         sys.exit(-1)
 
-    cur = conn.cursor()
+    clcur = clconn.cursor()
+    phcur = phageconn.cursor()
 
     for c in clusters:
         sql = """
@@ -202,18 +204,18 @@ def insert_into_database(clusters, conn, metadata_id, protein_info, verbose=Fals
             c.shortest_len, c.average_size, c.number_of_members, json.dumps(c.functions), c.function,
             c.number_of_functions, c.only_hypothetical
         ]
-        cur.execute(sql, data)
-        cluster_id = cur.lastrowid
+        clcur.execute(sql, data)
+        cluster_id = clcur.lastrowid
         for m in c.members:
             if m not in protein_info:
-                exc = cur.execute("select protein_rowid from protein where protein_md5sum = ?", [m])
+                exc = phcur.execute("select protein_rowid from protein where protein_md5sum = ?", [m])
                 tple = exc.fetchone()
                 if not tple[0]:
                     sys.stderr.write(f"{color.RED}No protein info for {m}{color.ENDC}\n")
                     continue
                 protein_info[m] = tple[0]
-            cur.execute("INSERT INTO proteincluster (protein, cluster) VALUES (?,?)", [protein_info[m], cluster_id])
-    conn.commit()
+            clcur.execute("INSERT INTO proteincluster (protein, cluster) VALUES (?,?)", [protein_info[m], cluster_id])
+    clconn.commit()
 
 
 if __name__ == '__main__':

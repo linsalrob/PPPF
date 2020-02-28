@@ -7,17 +7,27 @@ import sys
 import argparse
 
 from pppf_lib import color
-from pppf_databases import load_genbank_file, connect_to_db, disconnect, define_all_tables
+from pppf_databases import load_genbank_file, connect_to_db, disconnect, define_phage_tables, define_cluster_tables
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Create a database and load it with GenBank data")
-    parser.add_argument('-d', help='SQL output database', required=True)
+    parser.add_argument('-p', help='Phage SQL output database', required=True)
+    parser.add_argument('-c', help='clusters SQLite database', required=True)
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
-    conn = connect_to_db(args.d, args.v)
-    sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Tables{color.ENDC}\n")
-    define_all_tables(conn, args.v)
-    disconnect(conn, args.v)
+
+    sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Phage Tables{color.ENDC}\n")
+    phageconn = connect_to_db(args.p, args.v)
+    define_phage_tables(phageconn, args.v)
+    phageconn.commit()  # final commit to make sure everything saved!
+    disconnect(phageconn, args.v)
+
+    sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Cluster Tables{color.ENDC}\n")
+    clconn    = connect_to_db(args.c, args.v)
+    define_cluster_tables(clconn, args.v)
+    clconn.commit()
+    disconnect(clconn, args.v)
+

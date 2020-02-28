@@ -260,9 +260,9 @@ def define_proteinclusters_table(conn, verbose=False):
     conn.commit()
 
 
-def define_all_tables(conn, verbose=False):
+def define_phage_tables(conn, verbose=False):
     """
-    Just run all the above definitions
+    Run the above definitions for phages
     :param conn: The database connection
     :param verbose: more output
     :return:
@@ -272,18 +272,36 @@ def define_all_tables(conn, verbose=False):
     define_gene_table(conn, verbose)
     define_protein_table(conn, verbose)
     define_trna_table(conn, verbose)
+
+
+def define_cluster_tables(conn, verbose=False):
+    """
+    Run the above definitions for clusters
+    :param conn: The database connection
+    :param verbose: more output
+    :return:
+    """
+
     define_clusterdefinitions_table(conn, verbose)
     define_cluster_table(conn, verbose)
     define_proteinclusters_table(conn, verbose)
     define_protein_sequence_table(conn, verbose)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create tables for a database')
-    parser.add_argument('-d', help='database file name', required=True)
+    parser.add_argument('-p', help='phage genome database file name')
+    parser.add_argument('-c', help='cluster genome database file name')
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
-    conn = database_handles.connect_to_db(args.d, args.v)
-    define_all_tables(conn, args.v)
-    conn.commit() # final commit to make sure everything saved!
-    database_handles.disconnect(conn, args.v)
+    if args.p:
+        phageconn = database_handles.connect_to_db(args.p, args.v)
+        define_phage_tables(phageconn, args.v)
+        phageconn.commit()  # final commit to make sure everything saved!
+        database_handles.disconnect(phageconn, args.v)
+    if args.c:
+        clconn    = database_handles.connect_to_db(args.c, args.v)
+        define_cluster_tables(clconn, args.v)
+        clconn.commit()
+        database_handles.disconnect(clconn, args.v)
