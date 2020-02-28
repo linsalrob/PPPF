@@ -19,15 +19,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Phage Tables{color.ENDC}\n")
-    phageconn = connect_to_db(args.p, args.v)
-    define_phage_tables(phageconn, args.v)
-    phageconn.commit()  # final commit to make sure everything saved!
-    disconnect(phageconn, args.v)
+    if args.p:
+        sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Phage Tables{color.ENDC}\n")
+        phageconn = connect_to_db(args.p, args.v)
+        define_phage_tables(phageconn, args.v)
+        phageconn.commit()  # final commit to make sure everything saved!
+        disconnect(phageconn, args.v)
 
-    sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Cluster Tables{color.ENDC}\n")
-    clconn    = connect_to_db(args.c, args.v)
-    define_cluster_tables(clconn, args.v)
-    clconn.commit()
-    disconnect(clconn, args.v)
+    if args.c:
+        sys.stderr.write(f"{color.BOLD}{color.BLUE}Defining Cluster Tables{color.ENDC}\n")
+        clconn    = connect_to_db(args.c, args.v)
+        define_cluster_tables(clconn, args.v)
+        clconn.commit()
+        disconnect(clconn, args.v)
 
+    if not args.p and not args.c:
+        sys.stderr.write(f"{color.RED}Nothing to do!{color.ENDC}\n")
