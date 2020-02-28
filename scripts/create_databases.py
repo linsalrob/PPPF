@@ -13,8 +13,8 @@ from pppf_databases import load_genbank_file, connect_to_db, disconnect, define_
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Create a database and load it with GenBank data")
-    parser.add_argument('-p', help='Phage SQL output database', required=True)
-    parser.add_argument('-c', help='clusters SQLite database', required=True)
+    parser.add_argument('-p', help='Phage SQL output database')
+    parser.add_argument('-c', help='clusters SQLite database')
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
