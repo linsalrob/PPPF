@@ -208,7 +208,7 @@ def insert_into_database(clusters, clconn, phageconn, metadata_id, protein_info,
         cluster_id = clcur.lastrowid
         for m in c.members:
             if m not in protein_info:
-                exc = phcur.execute("select protein_rowid from protein where protein_md5sum = ?", [m])
+                exc = phcur.execute("select protein_sequence_rowid from protein_sequence where protein_md5sum = ?", [m])
                 tple = exc.fetchone()
                 if not tple[0]:
                     sys.stderr.write(f"{color.RED}No protein info for {m}{color.ENDC}\n")
