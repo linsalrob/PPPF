@@ -26,12 +26,11 @@ PHAGE_DATABASE = config['phage_database']
 CLUSTER_DATABASE = config['cluster_database']
 
 
-os.path.join(GENOMEDIR, f"{todaysdate}.sequences.gb")
 # we don't include this as a rule because if the database
 # does not exist, the initial load takes a long time
 # and we want you to do it!
 
-if not os.path.exists(PHAGE_DATABASE) or not os.path..exists(CLUSTER_DATABASE):
+if not os.path.exists(PHAGE_DATABASE) or not os.path.exists(CLUSTER_DATABASE):
     sys.stderr.write(f"WARNING: {PHAGE_DATABASE} or {CLUSTER_DATABASE} does not exist\n")
     sys.stderr.write("""
 If this is the first time you are running the code, please make the
