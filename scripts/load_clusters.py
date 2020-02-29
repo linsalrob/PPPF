@@ -12,7 +12,7 @@ from pppf_clusters import read_mmseqs_clusters, add_functions_to_clusters, inser
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load the cluster information into the databases')
     parser.add_argument('-p', help='Phage SQL database', required=True)
-    parser.add_argument('-c', help='Clusters SQL database', rquired=True)
+    parser.add_argument('-c', help='Clusters SQL database', required=True)
     parser.add_argument('-t', help='Cluster tsv file', required=True)
     parser.add_argument('-n', help='Cluster name (short text)', required=True)
     parser.add_argument('-s', help='Cluster description (human readable text)', required=True)
