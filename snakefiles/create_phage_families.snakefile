@@ -51,7 +51,7 @@ todaysdate = date.today().strftime('%Y%m%d')
 rule all:
     input:
         expand(
-            os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload"),
+            os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload.sh"),
                tps   = config['mmseqs']['types'], 
                seqid = config['mmseqs']['seqids']
                )
@@ -114,10 +114,11 @@ rule create_tsv:
     shell:
         "mmseqs createtsv {input.db} {input.db} {params.cl} {output.tsv}"
 
-
 rule load_database:
     """
-    Put all the data in our database
+    Put all the data in our database.
+    Note that currently we make a shell script for each of these, because we need to run them serially since
+    the database has a lock so concurrent threads are blocked
     """
     input:
         tsv = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.tsv")
@@ -125,8 +126,8 @@ rule load_database:
         summ = 'mmseqs clustered type {tps} at {seqid} fraction homology',
         name = 'mmseqs {tps}--{seqid}'
     output:
-        out = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload")
+        out = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload.sh")
     shell:
         """
-        python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -c 'create_phage_families.snakefile' {VERBOSE} > {output.out}
+        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -c 'create_phage_families.snakefile' {VERBOSE}" > {output.out}
         """
