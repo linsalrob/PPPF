@@ -7,7 +7,7 @@ import sys
 import argparse
 
 from pppf_lib import color
-from pppf_databases import load_genbank_file, connect_to_db, disconnect, define_all_tables
+from pppf_databases import load_genbank_file, connect_to_db, disconnect
 
 
 
