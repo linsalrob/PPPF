@@ -249,7 +249,6 @@ def define_proteinclusters_table(conn, verbose=False):
             proteincluster_rowid INTEGER PRIMARY KEY,
             protein INTEGER NOT NULL,
             cluster INTEGER NOT NULL,
-            FOREIGN KEY(protein) REFERENCES protein(protein_rowid),
             FOREIGN KEY(cluster) REFERENCES cluster(cluster_rowid)
         )""")
     conn.cursor().execute("CREATE UNIQUE INDEX proteincluster_idx1 ON proteincluster(proteincluster_rowid);")
