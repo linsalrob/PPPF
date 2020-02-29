@@ -66,7 +66,7 @@ rule dump_all_protein_sequences:
         f"{todaysdate}.proteins.fasta"
     shell:
         """
-        sqlite3 {DATABASE} "select protein_md5sum, protein_sequence from protein_sequence" \
+        sqlite3 {PHAGE_DATABASE} "select protein_md5sum, protein_sequence from protein_sequence" \
                 | sed 's/^/>/; s/|/\\n/' > {output}
         """
 
