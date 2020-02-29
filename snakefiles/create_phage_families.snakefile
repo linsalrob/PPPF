@@ -129,5 +129,5 @@ rule load_database:
         out = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload.sh")
     shell:
         """
-        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -c 'create_phage_families.snakefile' {VERBOSE}" > {output.out}
+        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -l 'create_phage_families.snakefile' {VERBOSE}" > {output.out}
         """
