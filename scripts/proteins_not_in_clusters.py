@@ -29,7 +29,15 @@ if __name__ == '__main__':
     for (m, c) in ex.fetchall():
         cl.add(m)
 
+    if args.v:
+        sys.stderr.write(f"{color.GREEN}Loaded {len(cl)} proteins{color.ENDC}\n")
+
     ex = pcur.execute("select protein_md5sum, protein_sequence from protein_sequence")
+    n = 0
     for (m, s) in ex.fetchall():
+        n += 1
         if m not in cl:
             print(f">{m}\n{s}")
+    if args.v:
+        sys.stderr.write(f"{color.GREEN}Tested {n} proteins{color.ENDC}\n")
+
