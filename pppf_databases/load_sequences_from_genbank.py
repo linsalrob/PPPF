@@ -77,7 +77,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 # if there is no protein sequence (yes, there are some genbank records with no protein sequence)
                 # we don't continue
                 if len(prtmtd['translation']) == 0:
-                    sys.stderr.write(f"SKIPPED: No translation for {prtmtd['protein_id']}\n")
+                    # sys.stderr.write(f"SKIPPED: No translation for {prtmtd['protein_id']}\n")
                     continue
 
                 (start, stop, strand) = (feat.location.start.position, feat.location.end.position, feat.strand)
