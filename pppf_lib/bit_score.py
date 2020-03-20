@@ -10,7 +10,7 @@ measure.
 import os
 import sys
 import argparse
-from formatting import color, stream_blast_results
+from roblib import color, stream_blast_results
 __author__ = 'Rob Edwards'
 
 def self_bit_scores(blastf, verbose=False):
