@@ -23,6 +23,12 @@ You're relying on GitHub, so good luck. At the moment, if you are interested in 
  ```bash
 snakemake -s PPPF/snakefiles/download_phages.snakefile --configfile process_phages.json
 ```
+
+if you are running on Edwards' local compute resources, you can use this command to run the download on the cluster. You may need to install some PERL dependencies for [eutils](https://www.ncbi.nlm.nih.gov/books/NBK25497/).
+
+```bash
+snakemake -s ~/GitHubs/PPPF/snakefiles/download_phages.snakefile --cluster 'qsub -cwd -o sge_download.out -e sge_download.err -V' -j 200 --latency-wait 60
+```
  
  It will download a new set of accessions, and then check the database to see what needs to be added. 
  Note that currently we do not delete anything from the database.
