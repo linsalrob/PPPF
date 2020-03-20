@@ -6,7 +6,6 @@ import os
 import sys
 import argparse
 
-from roblib import bcolors
 from pppf_databases import connect_to_db, disconnect
 from pppf_clusters import read_mmseqs_clusters, add_functions_to_clusters
 from pppf_lib import color

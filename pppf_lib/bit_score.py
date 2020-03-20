@@ -10,7 +10,7 @@ measure.
 import os
 import sys
 import argparse
-from roblib import bcolors, stream_blast_results
+from formatting import color, stream_blast_results
 __author__ = 'Rob Edwards'
 
 def self_bit_scores(blastf, verbose=False):
@@ -20,7 +20,7 @@ def self_bit_scores(blastf, verbose=False):
 
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Calculating self:self bitscores{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Calculating self:self bitscores{color.ENDC}\n")
 
     ss = {}
     for b in stream_blast_results(blastf, verbose):
@@ -43,7 +43,7 @@ def pairwise_bit_scores(blastf, ss, verbose=False):
     """
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Creating scores{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Creating scores{color.ENDC}\n")
 
     pb = {}
 
@@ -62,7 +62,7 @@ def pairwise_bit_scores(blastf, ss, verbose=False):
             # the average length of the proteins
             # i.e. the sum of the lengths
             if verbose:
-                sys.stderr.write(f"{bcolors.PINK}Had to guess self:self score for {b.query} to {b.db}{bcolors.ENDC}\n")
+                sys.stderr.write(f"{color.PINK}Had to guess self:self score for {b.query} to {b.db}{color.ENDC}\n")
             nb = 1 - (b.bitscore / (b.query_length + b.subject_length + 3.3))
 
         if b.query in pb[b.db] and pb[b.db][b.query] > nb:
@@ -97,7 +97,7 @@ def write_matrix(outf, pb, verbose=False):
     """
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Creating scores{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Creating scores{color.ENDC}\n")
 
     allkeys = list(pb.keys())
 
@@ -126,7 +126,7 @@ def precluster(pb, cutoff, verbose=False):
     """
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Creating clusters{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Creating clusters{color.ENDC}\n")
 
     clusters_by_id = {}
     id_by_clusters = {}
@@ -171,10 +171,10 @@ def precluster(pb, cutoff, verbose=False):
         clusters_by_id.update({x:currentcluster for x in friends})
         id_by_clusters[currentcluster] = friends
         if verbose:
-            sys.stderr.write(f"{bcolors.BLUE}Added cluster {currentcluster}{bcolors.ENDC}\n")
+            sys.stderr.write(f"{color.BLUE}Added cluster {currentcluster}{color.ENDC}\n")
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Maximum cluster is {clustercount} but we have {len(id_by_clusters.keys())} clusters{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Maximum cluster is {clustercount} but we have {len(id_by_clusters.keys())} clusters{color.ENDC}\n")
 
     return id_by_clusters
 
@@ -188,7 +188,7 @@ def write_clusters(outf, cls, verbose=False):
     """
 
     if verbose:
-        sys.stderr.write(f"{bcolors.GREEN}Writing clusters{bcolors.ENDC}\n")
+        sys.stderr.write(f"{color.GREEN}Writing clusters{color.ENDC}\n")
 
     out=open(outf + ".cls", 'w')
     out.write("cluster\tproteinID\n")
