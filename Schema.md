@@ -118,6 +118,9 @@ function | TEXT | The most likely (abundant) function of the proteins in this cl
 number_of_functions | INTEGER | The number of (unique) functions in this cluster
 only_hypothetical | INTEGER | Are all the functions in this cluster hypothetical
 
+
+**Note:** Currently, `functions` is a `JSON` object that captures the name of the functions (products in a genbank file) and the count of those. The sum of function counts does not equal the number of members in the cluster, because there is a one protein sequence (md5sum) : many proteins relationship, and we count each protein individually. 
+
 ## ProteinCluster
 
 The `proteincluster` table holds the connections between *proteins* and *clusters*. Neither protein nor cluster in this table needs to be unique (i.e. many:many)
