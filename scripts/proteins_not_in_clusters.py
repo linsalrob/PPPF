@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 
-from formatting import color
+from pppf_lib import color
 from pppf_databases import connect_to_db, disconnect
 
 
