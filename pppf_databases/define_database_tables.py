@@ -258,6 +258,31 @@ def define_proteinclusters_table(conn, verbose=False):
     conn.cursor().execute("CREATE INDEX proteincluster_idx5 ON proteincluster(cluster, protein);")
     conn.commit()
 
+def define_md5clusters_table(conn, verbose=False):
+    """
+    The connection between md5 clusters and cluster Ids
+    :param conn: The database connection
+    :param verbose: more output
+    :return:
+    """
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Creating MD5CLUSTERS table{color.ENDC}\n")
+
+    conn.cursor().execute("""
+        CREATE TABLE md5cluster (
+            md5cluster_rowid INTEGER PRIMARY KEY,
+            protein_md5sum TEXT NOT NULL,
+            cluster INTEGER NOT NULL,
+            FOREIGN KEY(cluster) REFERENCES cluster(cluster_rowid)
+        )""")
+    conn.cursor().execute("CREATE UNIQUE INDEX md5cluster_idx1 ON md5cluster(md5cluster_rowid);")
+    conn.cursor().execute("CREATE INDEX md5cluster_idx2 ON md5cluster(md5cluster_rowid, protein_md5sum);")
+    conn.cursor().execute("CREATE INDEX md5cluster_idx3 ON md5cluster(md5cluster_rowid, cluster);")
+    conn.cursor().execute("CREATE INDEX md5cluster_idx4 ON md5cluster(protein_md5sum, cluster);")
+    conn.cursor().execute("CREATE INDEX md5cluster_idx5 ON md5cluster(cluster, protein_md5sum);")
+    conn.commit()
+
+
 
 def define_phage_tables(conn, verbose=False):
     """
@@ -284,7 +309,7 @@ def define_cluster_tables(conn, verbose=False):
     define_clusterdefinitions_table(conn, verbose)
     define_cluster_table(conn, verbose)
     define_proteinclusters_table(conn, verbose)
-
+    define_md5clusters_table(conn, verbose)
 
 
 if __name__ == '__main__':
