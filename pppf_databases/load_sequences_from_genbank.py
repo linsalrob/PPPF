@@ -74,12 +74,6 @@ def load_genbank_file(gbkf, conn, verbose=True):
                         # we handle this separately as we want them all
                         srcmtd['db_xref'] = "|".join(feat.qualifiers['db_xref'])
             if feat.type == 'CDS':
-                # if there is no protein sequence (yes, there are some genbank records with no protein sequence)
-                # we don't continue
-                if len(prtmtd['translation']) == 0:
-                    # sys.stderr.write(f"SKIPPED: No translation for {prtmtd['protein_id']}\n")
-                    continue
-
                 (start, stop, strand) = (feat.location.start.position, feat.location.end.position, feat.strand)
                 for p in prtmtd:
                     if p in feat.qualifiers:
@@ -92,6 +86,12 @@ def load_genbank_file(gbkf, conn, verbose=True):
                         prtmtd['product'] = "Hypothetical protein"
                 else:
                     prtmtd['product'] = "Hypothetical protein"
+
+                # if there is no protein sequence (yes, there are some genbank records with no protein sequence)
+                # we don't continue
+                if len(prtmtd['translation']) == 0:
+                    sys.stderr.write(f"SKIPPED: No translation for {prtmtd['protein_id']}\n")
+                    continue
                 
                 # add the protein sequence and md5sum and sequence if we don't already have it
                 ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", [prtmd5])
