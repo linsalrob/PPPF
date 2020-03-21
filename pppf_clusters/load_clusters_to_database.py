@@ -98,7 +98,6 @@ def add_functions_to_clusters(cls, phageconn, verbose=False):
         """
 
         plens = []
-        fncount = {}
 
         # note we retrieve the information for the exemplar first and
         # then if it is the longest/shortest it remains that way
@@ -129,15 +128,14 @@ def add_functions_to_clusters(cls, phageconn, verbose=False):
                     shortestid = c
                     shortestlen = seqlen
                 plens.append(seqlen)
-                fncount[prdct] = fncount.get(prdct, 0) + 1
+                clu.functions[prdct] = clu.functions.get(prdct, 0) + 1
         clu.longest_id = longestid
         clu.longest_len = longestlen
         clu.shortest_id = shortestid
         clu.shortest_len = shortestlen
         clu.average_size = sum(plens)/len(plens)
-        clu.functions = fncount
         clu.number_of_functions = len(clu.functions)
-        allfn = sorted(fncount.items(), key=lambda item: item[1], reverse=True)
+        allfn = sorted(clu.functions.items(), key=lambda item: item[1], reverse=True)
         assert isinstance(clu, Cluster)
         clu.function = allfn[0][0]
         clu.is_hypothetical()
@@ -215,7 +213,8 @@ def insert_into_database(clusters, clconn, phageconn, metadata_id, protein_info,
                     continue
                 protein_info[m] = tple[0]
             clcur.execute("INSERT INTO proteincluster (protein, cluster) VALUES (?,?)", [protein_info[m], cluster_id])
-    clconn.commit()
+            clcur.execute("INSERT INTO md5cluster (protein_md5sum, cluster) VALUES (?,?)", [m, cluster_id])
+            clconn.commit()
 
 
 if __name__ == '__main__':
