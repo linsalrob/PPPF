@@ -92,7 +92,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 if len(prtmtd['translation']) == 0:
                     sys.stderr.write(f"SKIPPED: No translation for {prtmtd['protein_id']}\n")
                     continue
-                
+
                 # add the protein sequence and md5sum and sequence if we don't already have it
                 ex = c.execute("select protein_md5sum from protein_sequence where protein_md5sum = ?", [prtmd5])
                 tple = ex.fetchone()
