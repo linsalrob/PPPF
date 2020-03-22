@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', help='verbose output', action='store_true')
     args = parser.parse_args()
 
-    conn = connect_to_db(args.d, args.v)
+    conn = connect_to_db(args.p, args.v)
     protein_to_fasta(conn, args.f, args.v)
     disconnect(conn, args.v)
 
