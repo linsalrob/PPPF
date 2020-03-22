@@ -21,7 +21,7 @@ def protein_to_fasta(conn, outputfile=None, verbose=False):
     if verbose:
         sys.stderr.write(f"{color.GREEN}Creating fasta file{color.ENDC}\n")
 
-    ex = conn.curr().execute("SELECT protein_md5sum, protein_sequence from protein_sequence")
+    ex = conn.cursor().execute("SELECT protein_md5sum, protein_sequence from protein_sequence")
     out = open(outputfile, 'w') if outputfile else sys.stdout
     for row in ex.fetchall():
         out.write(f">{row[0]}\n{row[1]}\n")
