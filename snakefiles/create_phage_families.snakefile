@@ -51,10 +51,10 @@ todaysdate = date.today().strftime('%Y%m%d')
 rule all:
     input:
         expand(
-            os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload.sh"),
-               tps   = config['mmseqs']['types'], 
-               seqid = config['mmseqs']['seqids']
-               )
+            "clusters.type{tps}.id{seqid}.dbload.sh",
+            tps   = config['mmseqs']['types'], 
+            seqid = config['mmseqs']['seqids']
+        )
 
 
 
@@ -87,7 +87,14 @@ rule format_mmseqs_db:
 
 rule cluster_proteins:
     """
-    Build mmseqs clusters of those protein sequences
+    Build mmseqs clusters of those protein sequences.
+
+    Two things of note: first, we specify one thread, which takes (obvs)
+    longer, but we end up with a single output file per cluster.
+
+    Second, we use $(mktemp -d -p {TMPDIR}) to create a temporary
+    directory in the {TMPDIR} directory. Otherwise, mmseqs
+    has a habit of stepping on itself.
     """
     input:
         db = f"{todaysdate}.proteins.db",
@@ -98,7 +105,7 @@ rule cluster_proteins:
     output:
         idx = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.index")
     shell:
-        "mmseqs cluster --cov-mode {params.tp} --min-seq-id {params.seqid} {input.db} {params.cl} {TMPDIR}"
+        "mmseqs cluster --threads 1 --cov-mode {params.tp} --min-seq-id {params.seqid} {input.db} {params.cl} $(mktemp -d -p {TMPDIR})"
 
 rule create_tsv:
     """
@@ -126,7 +133,7 @@ rule load_database:
         summ = 'mmseqs clustered type {tps} at {seqid} fraction homology',
         name = 'mmseqs {tps}--{seqid}'
     output:
-        out = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.dbload.sh")
+        out = "clusters.type{tps}.id{seqid}.dbload.sh"
     shell:
         """
         echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -l 'create_phage_families.snakefile' {VERBOSE}" > {output.out}

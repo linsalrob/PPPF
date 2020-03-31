@@ -57,7 +57,8 @@ todaysdate = date.today().strftime('%Y%m%d')
 
 rule all:
     input:
-        f"{todaysdate}.dbupdated"
+        f"{todaysdate}.dbupdated",
+        f"{todaysdate}.new_proteins.fasta"
 
 
 rule eutils_phage_accessions:
@@ -107,3 +108,16 @@ rule load_database:
         f"{todaysdate}.dbupdated"
     shell:
         "python3 /home3/redwards/GitHubs/PPPF/scripts/load_databases.py -p {PHAGE_DATABASE} -f {input} -v > {output}"
+
+rule find_new_proteins:
+    """
+    Find any proteins we have not yet added to clusters
+    """
+    input:
+        semaphore_file = f"{todaysdate}.dbupdated"
+    output:
+        f"{todaysdate}.new_proteins.fasta"
+    shell:
+        """
+        python3 ~/GitHubs/PPPF/scripts/proteins_not_in_clusters.py -p  {PHAGE_DATABASE} -c  {CLUSTER_DATABASE} -v > {output}
+        """
