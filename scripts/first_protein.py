@@ -5,7 +5,8 @@ What is the function of the first protein in the genome?
 import os
 import sys
 import argparse
-from database_handles import connect_to_db, disconnect
+from pppf_databases import connect_to_db, disconnect
+from pppf_lib import colour
 
 __author__ = 'Rob Edwards'
 __copyright__ = 'Copyright 2020, Rob Edwards'
@@ -26,16 +27,21 @@ if __name__ == '__main__':
     gene_query = "select gene_rowid, contig, start, end, protein from gene"
     exc = cur.execute(gene_query)
 
+    if args.v:
+        sys.stderr.write(f"{colour.GREEN}Reading gene locations{colour.ENDC}\n")
     firstgene = {}
-    for tple in exc.fetch_row():
+    for tple in exc.fetchall():
+        contig = tple[1]
         if contig not in firstgene:
             firstgene[contig] = tple
         l = min(tple[2], tple[3])
         if l < firstgene[contig][2] or l < firstgene[contig][2]:
             firstgene[contig] = tple
 
+    if args.v:
+        sys.stderr.write(f"{colour.GREEN}Reading proteins{colour.ENDC}\n")
     protein_query = "select protein_id, product, locus_tag from protein where protein_rowid = ?"
     for contig in firstgene:
-        exc = cur.execute(protein_query, firstgene[contig][4])
-        tple = exc.fetch_one()
+        exc = cur.execute(protein_query, [firstgene[contig][4]])
+        tple = exc.fetchone()
         print("\t".join(map(str, firstgene[contig] + tple)))
