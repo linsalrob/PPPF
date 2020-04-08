@@ -21,7 +21,7 @@ def get_functions(proteinid, clusterdb_cursor, verbose=False):
     """
 
     sql = "select function, functions from cluster left join md5cluster on md5cluster.cluster = cluster.cluster_rowid where md5cluster.protein_md5sum = ?;"
-    ex = clusterdb_cursor.execute(sql, proteinid)
+    ex = clusterdb_cursor.execute(sql, [proteinid])
     return ex.fetchone()
 
 def proteinid_to_function(proteinid, clusterdb_cursor, verbose=False):
@@ -68,8 +68,8 @@ if __name__ == '__main__':
     c= connect_to_db(args.c, args.v)
     fn = proteinid_to_function(args.i, c.cursor(), args.v)
     fns = proteinid_to_all_functions(args.i, c.cursor(), args.v)
-    fnstr = "\n".join([f"{x} -> {str(fns[x])}" for x in fns])
+    fnstr = "\n".join([f"{x} -> {str(y)}" for x,y in sorted(fns.items(), key=lambda item: item[1], reverse=True)])
 
 
-    print(f"The function of {args.i} is {fn}")
-    print(f'All the functions are {fnstr}')
+    print(f"The function of {args.i} is\n'{fn}'")
+    print(f'All the functions are:\n{fnstr}')
