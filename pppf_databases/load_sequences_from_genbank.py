@@ -166,6 +166,22 @@ def load_genbank_file(gbkf, conn, verbose=True):
                              str(seq.seq), seqmd5, len(seq)])
         conn.commit()
 
+def create_full_text_search(conn, verbose=True):
+    """
+    Create a full text search virtual table on the protein products
+    :param conn: the database connection
+    :param verbose: more output
+    :return: 
+    """
+
+    if verbose:
+        sys.stderr.write(f"{color.GREEN}Adding full text search capabilities{color.ENDC}\n")
+    
+    c = conn.cursor()
+    c.execute("CREATE VIRTUAL TABLE protein_fts using FTS5(protein_rowid, product);")
+    c.execute("INSERT INTO protein_fts SELECT protein_rowid, product FROM protein;")
+    conn.commit()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load genbank data into an SQLite table')
@@ -176,4 +192,5 @@ if __name__ == '__main__':
 
     conn = connect_to_db(args.p, args.v)
     load_genbank_file(args.f, conn, args.v)
+    create_full_text_search(conn, args.v)
     disconnect(conn, args.v)
