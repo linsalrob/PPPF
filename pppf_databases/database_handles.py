@@ -3,6 +3,7 @@ Create and maintain the connections to the SQLite database
 """
 
 import sys
+import os
 import sqlite3
 from pppf_lib import color
 
@@ -14,6 +15,9 @@ def connect_to_db(dbname, verbose=False):
     :param verbose: print addtional output
     :return: the database connection
     """
+    if not os.path.exists(dbname):
+        sys.stderr.write(f"{color.RED}FATAL: {dbname} does not exist. Cannot connect{color.ENDC}\n")
+        sys.exit(-1)
 
     try:
         conn = sqlite3.connect(dbname)
