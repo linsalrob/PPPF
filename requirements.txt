@@ -1,2 +1,4 @@
 jsonpickle>=1.2
 biopython>=1.76
+requests>=2.23
+uuid
