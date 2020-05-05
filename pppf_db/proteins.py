@@ -3,8 +3,7 @@ Functions to access the proteins database
 """
 
 from . import phagedb, clustersdb
-from . import connect_to_db, disconnect
-
+from pppf_databases import protein_to_fasta, connect_to_db, disconnect
 
 def lookup_word(word):
     """
@@ -21,5 +20,12 @@ def lookup_word(word):
     return ex.fetchone()[0]
 
 
+def print_all_proteins():
+    """
+    Print all the proteins to stdout
+    :return:  nothing
+    """
 
-
+    con = connect_to_db(phagedb)
+    protein_to_fasta(con)
+    disconnect(con)
