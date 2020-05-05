@@ -6,14 +6,13 @@ import os
 import sys
 import argparse
 
-from pppf_lib import color
+from pppf_accessories import color
 from Bio import SeqIO
-from formatting import color
 import database_handles
 
 
 
-# TODO
+# TODO .. appparently everything. Check the snake file
 
 
 if __name__ == '__main__':
