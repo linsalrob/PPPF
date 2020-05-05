@@ -7,7 +7,7 @@ This is a replacement for the snakemake download which doesn't work properly!
 
 import os
 import sys
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_lib import GenBank
 
 __author__ = 'Rob Edwards'

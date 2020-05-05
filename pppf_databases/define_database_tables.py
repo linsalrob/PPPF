@@ -6,7 +6,7 @@ import sys
 import argparse
 
 from pppf_databases import database_handles
-from pppf_lib import color
+from pppf_accessories import color
 
 def define_genome_table(conn, verbose=False):
     """

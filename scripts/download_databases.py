@@ -7,7 +7,7 @@ import sys
 import requests
 import argparse
 
-from pppf_lib import color
+from pppf_accessories import color
 from pppfdb import phagedb, clustersdb
 
 __author__ = 'Rob Edwards'

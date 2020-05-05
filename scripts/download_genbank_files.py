@@ -6,7 +6,7 @@ one per line
 import os
 import sys
 import argparse
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_lib import GenBankDownload
 
 __author__ = 'Rob Edwards'

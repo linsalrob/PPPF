@@ -4,7 +4,7 @@ A generic genbank class that holds the connection inforamtion
 
 import os
 import sys
-from pppf_lib import color
+from pppf_accessories import color
 from Bio import Entrez
 
 __author__ = 'Rob Edwards'

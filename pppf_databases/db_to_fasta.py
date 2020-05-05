@@ -1,5 +1,5 @@
 
-from pppf_lib import color
+from pppf_accessories import color
 import sys
 __author__ = 'Rob Edwards'
 

@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 from pppf_databases import connect_to_db, disconnect
-from pppf_lib import colour
+from pppf_accessories import color
 
 __author__ = 'Rob Edwards'
 __copyright__ = 'Copyright 2020, Rob Edwards'
