@@ -8,7 +8,7 @@ import requests
 import argparse
 
 from pppf_accessories import color
-from pppfdb import phagedb, clustersdb
+from pppf_db import phagedb, clustersdb
 
 __author__ = 'Rob Edwards'
 __copyright__ = 'Copyright 2020, Rob Edwards'
