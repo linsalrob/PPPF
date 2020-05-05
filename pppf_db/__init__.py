@@ -1,5 +1,5 @@
 """
-init file for pppfdb
+init file for pppf_db
 """
 
 from .db_paths import phagedb, clustersdb
