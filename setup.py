@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='PPPF-linsalrob',
-    version='0.0.2',
+    version='0.0.3',
     packages=setuptools.find_packages(),
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -31,6 +31,7 @@ setuptools.setup(
     entry_points = {
         'console_scripts' : [
             'pppf_download_databases = pppf_databases:download_all_databases',
+            'pppf_print_proteins = pppf_db:print_all_proteins'
         ]
     }
 )
