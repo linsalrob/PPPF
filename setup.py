@@ -31,7 +31,8 @@ setuptools.setup(
     entry_points = {
         'console_scripts' : [
             'pppf_download_databases = pppf_databases:download_all_databases',
-            'pppf_print_proteins = pppf_db:print_all_proteins'
+            'pppf_print_proteins = pppf_db:print_all_proteins',
+            'pppf_list_genomes = pppf_db:list_all_genomes'
         ]
     }
 )
