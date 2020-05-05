@@ -10,7 +10,7 @@ field lengths to define the database!
 import os
 import sys
 import argparse
-import pppfdb
+import pppf_db
 from pppf_databases import connect_to_db, disconnect
 
 __author__ = 'Rob Edwards'
@@ -21,7 +21,7 @@ __maintainer__ = 'Rob Edwards'
 __email__ = 'raedwards@gmail.com'
 
 
-for db in pppfdb.phagedb, pppfdb.clustersdb:
+for db in pppf_db.phagedb, pppf_db.clustersdb:
     print(f"Fields in {db}")
     con = connect_to_db(db)
     cursor = con.cursor()
