@@ -73,7 +73,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                     if 'db_xref' in feat.qualifiers:
                         # we handle this separately as we want them all
                         srcmtd['db_xref'] = "|".join(feat.qualifiers['db_xref'])
-            if feat.type == 'CDS':
+            elif feat.type == 'CDS':
                 (start, stop, strand) = (feat.location.start.position, feat.location.end.position, feat.strand)
                 for p in prtmtd:
                     if p in feat.qualifiers:
@@ -130,7 +130,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
 
                 conn.commit()
 
-            if feat.type == 'tRNA' or feat.type == 'tmRNA':
+            elif feat.type == 'tRNA' or feat.type == 'tmRNA':
                 (start, stop, strand) = (feat.location.start.position, feat.location.end.position, feat.strand)
                 for t in trnmtd:
                     if t in feat.qualifiers:
