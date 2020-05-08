@@ -20,8 +20,12 @@ However, we have made all our data, and the code to recreate it, available for e
 
 ## Installation
 
-You're relying on GitHub, so good luck. At the moment, if you are interested in working on this, you should contact  Rob Edwards. He could sure use the help! However, we do have some ways to get the data and access our models
- 
+### PIP installation
+
+```pythonstub
+pip install pppf
+```
+
 ### Getting started
  
 The [download_databases](python scripts/download_databases.py) script will download the two databases `phages.sql` [2.6 GB] and `clusters.sql` [1.8 GB] to the default location (currently `PPPF/data/databases/`) or to a location of your choosing. 
@@ -58,6 +62,7 @@ snakemake -s ~/GitHubs/PPPF/snakefiles/download_phages.snakefile --cluster 'qsub
 The basic structure is that each of the directories is a library, and the [scripts](scripts/) directory contains scripts that use those libraries. 
 
 Take a look at the [database schema](Schema.md) for a more detailed discussion of the schema we designed.
+
 
 ## Information
 
