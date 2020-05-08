@@ -1,4 +1,6 @@
+[![DOI](https://www.zenodo.org/badge/231460796.svg)](https://www.zenodo.org/badge/latestdoi/231460796)
 [![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.sdsu.edu/research)
+
 
 # PPPF
 # Probabilistic Phage Protein Families
