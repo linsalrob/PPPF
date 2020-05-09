@@ -50,7 +50,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
             'product': "",
             'protein_id': "",
             'ribosomal_slippage': "",
-            'transl_table': "",
+            'transl_table': 11,
             'translation': ""
         }
         # tRNA metadata
@@ -82,7 +82,7 @@ def load_genbank_file(gbkf, conn, verbose=True):
                 if 'product' in prtmtd:
                     if len(prtmtd['product']) > 1:
                         prtmtd['product'] = prtmtd['product'][0].upper() + prtmtd['product'][1:].lower()
-                    elif len(prtmtd['prodcut']) == 0:
+                    elif len(prtmtd['product']) == 0:
                         prtmtd['product'] = "Hypothetical protein"
                 else:
                     prtmtd['product'] = "Hypothetical protein"
