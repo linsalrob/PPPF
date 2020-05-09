@@ -33,9 +33,8 @@ import sys
 import json
 
 from pppf_databases import connect_to_db, disconnect
-from pppf_lib import color
 from .cluster import Cluster
-
+from pppf_accessories import color
 
 def read_mmseqs_clusters(clf, verbose=False):
     """

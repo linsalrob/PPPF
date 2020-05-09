@@ -8,7 +8,7 @@ import argparse
 
 from pppf_databases import connect_to_db, disconnect
 from pppf_clusters import read_mmseqs_clusters, add_functions_to_clusters
-from pppf_lib import color
+from pppf_accessories import color
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load the cluster information into the databases')

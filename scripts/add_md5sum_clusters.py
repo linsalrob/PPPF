@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 from pppf_databases import connect_to_db, disconnect
-from pppf_lib import color
+from pppf_accessories import color
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")

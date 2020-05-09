@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 import json
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_databases import connect_to_db, disconnect
 
 protein_functions = {}
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     fn = proteinid_to_function(args.i, c.cursor(), args.v)
     fns = proteinid_to_all_functions(args.i, c.cursor(), args.v)
     fnstr = "\n".join([f"{x} -> {str(y)}" for x,y in sorted(fns.items(), key=lambda item: item[1], reverse=True)])
-
+    disconnect(c, args.v)
 
     print(f"The function of {args.i} is\n'{fn}'")
     print(f'All the functions are:\n{fnstr}')

@@ -8,7 +8,7 @@ import sys
 import argparse
 import re
 
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_databases import connect_to_db, disconnect
 __author__ = 'Rob Edwards'
 

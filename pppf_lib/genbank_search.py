@@ -4,7 +4,7 @@ Search genbank and return a list of ccessions
 """
 import os
 import sys
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_lib import GenBank
 
 __author__ = 'Rob Edwards'

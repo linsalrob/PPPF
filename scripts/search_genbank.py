@@ -5,7 +5,8 @@ Search genbank for something
 import os
 import sys
 import argparse
-from pppf_lib import GenBankSearch, color
+from pppf_lib import GenBankSearch
+from pppf_accessories import color
 __author__ = 'Rob Edwards'
 
 

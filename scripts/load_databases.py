@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 
-from pppf_lib import color
+from pppf_accessories import color
 from pppf_databases import load_genbank_file, connect_to_db, disconnect
 
 

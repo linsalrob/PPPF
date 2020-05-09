@@ -11,7 +11,8 @@ import jsonpickle
 
 from pppf_clusters.cluster import Cluster
 from pppf_databases import connect_to_db
-from pppf_lib import is_hypothetical, color
+from pppf_lib import is_hypothetical
+from pppf_accessories import color
 
 def read_mmseqs_clusters(clf, verbose=False):
     """
