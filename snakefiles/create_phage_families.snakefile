@@ -54,7 +54,8 @@ rule all:
             "clusters.type{tps}.id{seqid}.dbload.sh",
             tps   = config['mmseqs']['types'], 
             seqid = config['mmseqs']['seqids']
-        )
+        ),
+        "load_databases.sh"
 
 
 
@@ -138,5 +139,15 @@ rule load_database:
         out = "clusters.type{tps}.id{seqid}.dbload.sh"
     shell:
         """
-        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -l '{params.cli} {params.odir} tempdir' {VERBOSE}" > {output.out}
+        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -d '{params.summ}' -c '{params.cli} {params.odir} tempdir' {VERBOSE}" > {output.out}
         """
+rule concat_loads:
+    """
+    Combine all the database loads into a file
+    """
+    input:
+        "clusters.type{tps}.id{seqid}.dbload.sh"
+    output:
+        "load_databases.sh"
+    shell:
+        "cat {input} > {output}"
