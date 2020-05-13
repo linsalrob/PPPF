@@ -60,6 +60,29 @@ snakemake -s ~/GitHubs/PPPF/snakefiles/download_phages.snakefile --cluster 'qsub
  It will download a new set of accessions, and then check the database to see what needs to be added. 
  Note that currently we do not delete anything from the database.
  
+
+## Make a small database
+
+If you want to make a smaller database of a set of genomes, create a database, use [load_databases.py](scripts/load_databases.py), to load it, and then use the snakemake to create the families.
+
+For example, to create a *Salmonella* phage only database, assuming you have all the phages downloaded you can do something like this:
+
+```bash
+# extract just those Salmonella phage
+grep DEFINITION genbank/* | grep Salmonella | cut -f 1 -d ':' | xargs -i cat {} >> Salmonella_phage.gbk
+
+# create the databases to be loaded
+python3 PPPF/scripts/create_databases.py -p salmonella_phages.sql -c salmonella_clusters.sql -v
+
+# load the phage database
+python3 PPPF/scripts/load_databases.py -p salmonella_phages.sql -f genbank/Salmonella_phage.gbk -v
+
+# create the clusters, etc
+snakemake -s ~/GitHubs/PPPF/snakefiles/create_phage_families.snakefile -j 24
+```
+
+
+
 ## Using PPPF
 
 The basic structure is that each of the directories is a library, and the [scripts](scripts/) directory contains scripts that use those libraries. 
