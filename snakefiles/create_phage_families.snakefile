@@ -131,10 +131,12 @@ rule load_database:
         tsv = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.tsv")
     params:
         summ = 'mmseqs clustered type {tps} at {seqid} fraction homology',
-        name = 'mmseqs {tps}--{seqid}'
+        name = 'mmseqs {tps}--{seqid}',
+        odir = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}"),
+        cli  = 'mmseqs cluster --threads 1 --cov-mode {tps} --min-seq-id {seqid} ' + f'{todaysdate}.proteins.db '
     output:
         out = "clusters.type{tps}.id{seqid}.dbload.sh"
     shell:
         """
-        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -l 'create_phage_families.snakefile' {VERBOSE}" > {output.out}
+        echo "python3 /home3/redwards/GitHubs/PPPF/scripts/load_clusters.py -p {PHAGE_DATABASE} -c {CLUSTER_DATABASE} -t {input.tsv} -n '{params.name}' -s '{params.summ}' -l '{params.cli} {params.odir} tempdir' {VERBOSE}" > {output.out}
         """
