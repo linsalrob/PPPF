@@ -53,7 +53,8 @@ snakemake -s PPPF/snakefiles/download_phages.snakefile --configfile process_phag
 if you are running on Edwards' local compute resources, you can use this command to run the download on the cluster. 
 
 ```bash
-snakemake -s ~/GitHubs/PPPF/snakefiles/download_phages.snakefile --cluster 'qsub -cwd -o sge_download.out -e sge_download.err -V' -j 200 --latency-wait 60
+mkdir sge_download.out sge_download.err
+snakemake -s ~/GitHubs/PPPF/snakefiles/download_phages.snakefile --cluster 'qsub -cwd -o sge_download.out -e sge_download.err -V -q important' --local-cores 6 -j 600 --latency-wait 60
 ```
  
  It will download a new set of accessions, and then check the database to see what needs to be added. 
