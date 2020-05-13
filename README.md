@@ -3,7 +3,7 @@
 
 
 # PPPF
-# Probabilistic Phage Protein Families
+# Probabilistic Phage Protein Functions
 
 ## Author
 
