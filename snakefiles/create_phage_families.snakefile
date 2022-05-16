@@ -1,5 +1,9 @@
 """
 Create protein families from our SQL database
+
+Run using:
+    snakemake -s ~/GitHubs/PPPF/snakefiles/create_phage_families.snakefile --local-cores 6 --cluster 'qsub -cwd -o sge_out -e sge_err -V -q default -pe make 16' --latency-wait 60 -j 600
+
 """
 
 
@@ -55,7 +59,8 @@ rule all:
             tps   = config['mmseqs']['types'], 
             seqid = config['mmseqs']['seqids']
         ),
-        "load_databases.sh"
+        "load_databases.sh",
+        "pppf_website_load_databases.sh"
 
 
 
@@ -106,7 +111,7 @@ rule cluster_proteins:
     output:
         idx = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.index")
     shell:
-        "mmseqs cluster --threads 1 --cov-mode {params.tp} --min-seq-id {params.seqid} {input.db} {params.cl} $(mktemp -d -p {TMPDIR})"
+        "mmseqs cluster --threads 16 --cov-mode {params.tp} --min-seq-id {params.seqid} {input.db} {params.cl} $(mktemp -d -p {TMPDIR})"
 
 rule create_tsv:
     """
@@ -134,7 +139,7 @@ rule load_database:
         summ = 'mmseqs clustered type {tps} at {seqid} fraction homology',
         name = 'mmseqs {tps}--{seqid}',
         odir = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}"),
-        cli  = 'mmseqs cluster --threads 1 --cov-mode {tps} --min-seq-id {seqid} ' + f'{todaysdate}.proteins.db '
+        cli  = 'mmseqs cluster --threads 16 --cov-mode {tps} --min-seq-id {seqid} ' + f'{todaysdate}.proteins.db '
     output:
         out = "clusters.type{tps}.id{seqid}.dbload.sh"
     shell:
@@ -146,8 +151,46 @@ rule concat_loads:
     Combine all the database loads into a file
     """
     input:
-        "clusters.type{tps}.id{seqid}.dbload.sh"
+        expand(
+            "clusters.type{tps}.id{seqid}.dbload.sh",
+            tps   = config['mmseqs']['types'], 
+            seqid = config['mmseqs']['seqids']
+        )
     output:
         "load_databases.sh"
+    shell:
+        "cat {input} > {output}"
+
+rule load_pppfweb_database:
+    """
+    Put all the data in our database for the website.
+    Note that currently we make a shell script for each of these, because we need to run them serially since
+    the database has a lock so concurrent threads are blocked
+    """
+    input:
+        tsv = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}.tsv")
+    params:
+        summ = 'mmseqs clustered type {tps} at {seqid} fraction homology',
+        name = 'mmseqs {tps}--{seqid}',
+        odir = os.path.join(CLUSTERDIR, "clusters.type{tps}.id{seqid}"),
+        cli  = 'mmseqs cluster --threads 16 --cov-mode {tps} --min-seq-id {seqid} ' + f'{todaysdate}.proteins.db '
+    output:
+        out = "clusters.type{tps}.id{seqid}.pppfweb.dbload.sh"
+    shell:
+        """
+        echo "python manage.py load_cluster_databases -t data/{input.tsv} -n '{params.name}' -d '{params.summ}' -c '{params.cli} {params.odir} tempdir' {VERBOSE}" > {output.out}
+        """
+rule concat_pppfweb_loads:
+    """
+    Combine all the web database loads into a single file
+    """
+    input:
+        expand(
+            "clusters.type{tps}.id{seqid}.dbload.sh",
+            tps   = config['mmseqs']['types'], 
+            seqid = config['mmseqs']['seqids']
+        )
+    output:
+        "pppf_website_load_databases.sh"
     shell:
         "cat {input} > {output}"
